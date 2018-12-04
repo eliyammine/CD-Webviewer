@@ -13,7 +13,7 @@
  */
 
 // [TODO] Modulize the entire "grid" object for easy namespace and member privacy
-// 
+//
 grid = {};
 util = {};
 stats = {};
@@ -26,17 +26,17 @@ grid.model = {};
 grid.model.name = 'CellDevsModel';	// Model Name (ID)
 grid.model.dimX = 1;	// Rows
 grid.model.dimY = 1;	// Columns
-grid.model.dimZ = 1; 	// Depth 
+grid.model.dimZ = 1; 	// Depth
 grid.model.frameCount = 0; // start with frame 0
 grid.model.updatePacketsPipe = [];
 grid.view = {};
 grid.view.viewBuffer = [];	// stores full frame copy of current view frame
 grid.view.dataCache = []; // stores periodic snapshots of frames to allow random seeking
-grid.view.CACHE_PERIOD = 10;	// Store a cache point once every 10 frames 
-grid.view.CACHE_ENABLED = true;	
-grid.view.SHOW_CACHE_ONLY = false;	
+grid.view.CACHE_PERIOD = 10;	// Store a cache point once every 10 frames
+grid.view.CACHE_ENABLED = true;
+grid.view.SHOW_CACHE_ONLY = false;
 grid.view.cacheCount = 0;
-//grid.view.cacheID = true;		// id of cache frames (e.g. 0:0, 10:1, 20:2, etc)	
+//grid.view.cacheID = true;		// id of cache frames (e.g. 0:0, 10:1, 20:2, etc)
 grid.view.currentTimeFrame = 1;
 grid.view.div = grab('grid');
 grid.view.valueDisplay = grab('showValues').checked;
@@ -46,7 +46,7 @@ grid.view.canvy = grab('canvy');
 grid.view.canvyDiv = grab('canvyDiv');
 grid.view.barHeight = 20; //pixels
 grid.view.barWidth = 15;
-grid.view.layoutColumns = 1; // columns of port layers 
+grid.view.layoutColumns = 1; // columns of port layers
 grid.view.layersNeedUpdate = true;
 grid.view.gridOverlayWidth = 1;
 grid.view.playbackHandle = 0;
@@ -83,6 +83,10 @@ grid.loadSimulation = function(){
 	grab('cellScale').value = SCL;
 	// Setup timeline ticks to match cached frames (purely aesthetic feedback)
 	//  -- harder than I thought. too much hastle at this point
+	//palette edition init
+	grab("BtnEditPalette").style.display = "inline-block";
+	grab("BtnEditPalette").disabled = false;
+	d3.selectAll("#paletteDiv").remove();
 }
 
 grid.setupGrid = function(){
@@ -95,28 +99,28 @@ grid.setupGrid = function(){
 	//grid.init() // reset grid data and reload input properties
 
 	var gridDiv = grid.view.div;
-	var gridData= grid.model; 
+	var gridData= grid.model;
 
 	// Set max columns
 	var cols = grab('layoutColumns');
-	cols.max = grid.model.ports.length * gridData.dimZ; 
+	cols.max = grid.model.ports.length * gridData.dimZ;
 	//cols.value = Math.min(cols.value, cols.max) // clip it if necessary
 
 	// Disable extra 'out' port by default
 	var skipOut = 0
 	if(grid.model.ports.length>1&&grid.model.ports[grid.model.ports.length-1]=='out')
-		skipOut = 1;	
+		skipOut = 1;
 
 	// If only single port in single layer, disable port title bar
 	grid.view.barHeight= (grid.model.ports.length == 1 && gridData.dimZ == 1) ? 0 : 20;
 	var canvy = grid.view.canvy;
-	
+
 	grid.view.gfx = canvy.getContext('2d');
 	var nGrid = gridData.dimZ*(grid.model.ports.length-skipOut);
-	
+
 	canvy.width = (gridData.dimX*SCL+grid.view.barWidth) * grid.view.layoutColumns - grid.view.barWidth+40;
 	canvy.height= (gridData.dimY*SCL+grid.view.barHeight)* Math.ceil(nGrid/grid.view.layoutColumns)+40;
-  
+
 	// Signal that layers need to be redrawn
 	grid.view.layersNeedUpdate = true;
 
@@ -130,23 +134,23 @@ grid.setupGrid = function(){
 
 	// Populate "Detected Layers" list and clear it
 	var layersList = grab('LayersList'); layersList.innerHTML='';
-	
+
 	for (var z=0; z<gridData.dimZ; z++){
-		layersList.innerHTML += 
+		layersList.innerHTML +=
 			"<label><input onclick='grid.toggleLayer(["+z+",-1])' type='checkbox' id='layer"+z+"' checked>Layer"+z+" (x,y,"+z+")</label><br>";
-				
+
 		for (var i=0; i<grid.model.ports.length;i++){
 			layersList.innerHTML += "&emsp;&#10149;<label><input onclick='grid.toggleLayer(["+z+","+i+
-					"])' type='checkbox' id='Layer"+z+"_Port"+grid.model.ports[i]+"' checked>Port:"+grid.model.ports[i]+"</label>" + 
+					"])' type='checkbox' id='Layer"+z+"_Port"+grid.model.ports[i]+"' checked>Port:"+grid.model.ports[i]+"</label>" +
 					"&emsp;<label><input onclick='grid.toggleCharts("+z+","+i+")' name='chartRadio' type='radio' id='Layer_"+z+"_Port_"+i+"_Chart'>Charts</label><br>";
-			
+
 			if(i==grid.model.ports.length-1)
 				LayersList.innerHTML += "<hr>";	// insert divider after last port in this layer
 		}
 		// Check weird 'out' port
 		if(skipOut)
 			grab('Layer'+z+'_Port'+'out').checked = false;
-		
+
 	}
 	//******************
 	// Finally, initialize the single view frame buffer, ready for rendering (updateGridView).
@@ -158,7 +162,7 @@ grid.setupGrid = function(){
 		fb[z] = [];
 		for (var y=gridData.dimY; y-->0;){
 			fb[z][y] = [];
-			for (var x=gridData.dimX; x-->0;){	
+			for (var x=gridData.dimX; x-->0;){
 				fb[z][y][x] = [];
 			}
 		}
@@ -192,22 +196,22 @@ grid.updateGridView = function(){
 
 	var layerWidth  = SCL*grid.model.dimX,	// not including port layer padding (barW)
 		layerHeight = SCL*grid.model.dimY;	// not including port title (barH)
-		
+
 	// Clear entire grid if layers need update
 	if(grid.view.layersNeedUpdate){
 		// Transparent pixels break Whammy encoder
-		//gfx.clearRect(0, 0,canvy.width,canvy.height); 
-		
+		//gfx.clearRect(0, 0,canvy.width,canvy.height);
+
 		// Use canvas div bg color instead
 		gfx.fillStyle = window.getComputedStyle(canvyDiv).getPropertyValue('background-color');
 		gfx.fillRect(0,0,canvy.width,canvy.height);
 	}
-	
+
 	// Is this frame cached? (i.e. last or multiple of caching period)
 	var	isLastFrame 	= (t==(grid.model.frameCount-1));
 	var	frameIsCached 	= isLastFrame || !(t%grid.view.CACHE_PERIOD);
 	grid.view.redrawRequested=grid.view.redrawRequested||frameIsCached; //request full frame render
-	var cacheID 		= isLastFrame ? dc.length-1: Math.floor(t/grid.view.CACHE_PERIOD);	
+	var cacheID 		= isLastFrame ? dc.length-1: Math.floor(t/grid.view.CACHE_PERIOD);
 	var cacheEnabled 	= grid.view.CACHE_ENABLED;
 	var showCacheOnly 	= grid.view.SHOW_CACHE_ONLY;
 
@@ -218,7 +222,7 @@ grid.updateGridView = function(){
 		for (var i=0; i<data[t].cells.length; i++){
 			var ps  = data[t].cells[i].position.slice();
 			var val = data[t].cells[i].value.slice();
-			// Only update ports that are defined (!null) in this time frame 
+			// Only update ports that are defined (!null) in this time frame
 			// (otherwise keep previous frame values; exactly what we want)
 			for(var portato=0; portato<ports.length;portato++)
 				if( val[portato] != null)
@@ -230,16 +234,16 @@ grid.updateGridView = function(){
 		//row=-1; // start "newline" every layer? comment if not desirable
 		for (var portID=0, port=-1 ; portID<ports.length; portID++){	// for each port
 			var isShowPort = grab('Layer'+layer+'_Port'+ports[portID]);
-			if(!isShowPort.checked || isShowPort.disabled) 
+			if(!isShowPort.checked || isShowPort.disabled)
 				continue;	// if port is unchecked or disabled, skip to next port
-			
+
 			// Increment displayed ports counter
 			port++;
 			// Increment column id (modulo user-specified layoutColumns)
 			column++; column %= cols;
 			// New row only if returned to column 0
 			if(column==0) row++;
-			
+
 			// Anchor (top-left corner of current port layer)
 			var layerPosX = column*(layerWidth+barW),
 				layerPosY = barH+row*(layerHeight+barH);
@@ -256,23 +260,23 @@ grid.updateGridView = function(){
 				gfx.font = 'normal '+barH*0.6+'px monospace';
 				gfx.textAlign = 'left';
 				gfx.fillStyle = 'rgb(190,190,190)';
-				gfx.fillText('\u25BC Layer:'+layer+' [Port:'+ports[portID]+']',layerPosX,layerPosY-barH*0.25);			
+				gfx.fillText('\u25BC Layer:'+layer+' [Port:'+ports[portID]+']',layerPosX,layerPosY-barH*0.25);
 			}
-			
+
 			// **** If redraw requested, render entire buffer(not just incremental update in this frame)
 			if(grid.view.redrawRequested){
-				// remove the request, we're about to process the last port of its last layer 
+				// remove the request, we're about to process the last port of its last layer
 				if(layer==grid.model.dimZ-1 && portID==ports.length-1)
 					grid.view.redrawRequested = false;
 				for (var y=grid.model.dimY; y-->0;){
-					for (var x=grid.model.dimX; x-->0;){	
+					for (var x=grid.model.dimX; x-->0;){
 						if(cacheEnabled && (frameIsCached || showCacheOnly))
 							v = dc[cacheID][layer][y][x][portID];	// use cache
 						else
 							v = fb[layer][y][x][portID];			// use framebuffer
 						gfx.shadowColor = 'rgba(0,0,0,0)';
 						gfx.shadowBlur = 0;
-						
+
 						// Find palette color p[i]=[[begin,end],[r,g,b]]
 						gfx.fillStyle = '#9696A0'; // start with default
 						for(var c=p.length;c-->0;){
@@ -287,7 +291,7 @@ grid.updateGridView = function(){
 							posY = layerPosY + SCL*y;
 						gfx.fillRect(posX,posY, SCL,SCL);
 
-						// Render the values (text) 
+						// Render the values (text)
 						gfx.fillStyle = 'white';
 						gfx.shadowColor = 'black';
 						gfx.shadowOffsetX = 0;
@@ -303,13 +307,13 @@ grid.updateGridView = function(){
 						if(vDisplay){
 							if(v==0)
 								gfx.fillText((zeroDisplay ? vP:''),(SCL/2)+posX,(SCL/1.3)+posY, SCL) ;
-							else 
+							else
 								// because Math.trunc() not yet supported by chrome, we do this:
 								//gfx.fillText((v<0 ? Math.ceil(v) : Math.floor(v)),(SCL/2)+posX,(SCL/1.3)+posY);
 								gfx.fillText(vP,(SCL/2)+posX,(SCL/1.3)+posY, SCL);
 						}
 					}
-				}	
+				}
 			}
 			else if(!showCacheOnly) {	// *** render incremental only (skip if only showing cache)
 				for(var i=0; i < data[t].cells.length; i++){
@@ -335,7 +339,7 @@ grid.updateGridView = function(){
 						posY = layerPosY + SCL*y;
 					gfx.fillRect(posX,posY, SCL,SCL);
 
-					// Render the values (text) 
+					// Render the values (text)
 					gfx.fillStyle = 'white';
 					gfx.shadowColor = 'black';
 					gfx.shadowOffsetX = 0;
@@ -351,7 +355,7 @@ grid.updateGridView = function(){
 					if(vDisplay){
 						if(v==0)
 							gfx.fillText((zeroDisplay ? 0:''),(SCL/2)+posX,(SCL/1.3)+posY, SCL) ;
-						else 
+						else
 							// because Math.trunc() not yet supported by chrome, we do this:
 							//gfx.fillText((v<0 ? Math.ceil(v) : Math.floor(v)),(SCL/2)+posX,(SCL/1.3)+posY);
 							gfx.fillText(vP,(SCL/2)+posX,(SCL/1.3)+posY, SCL);
@@ -361,7 +365,7 @@ grid.updateGridView = function(){
 
 			// Draw Grid Overlay
 			if(grab('showGridOverlay').checked){
-				gfx.shadowColor = 'rgba(0,0,0,0)';		
+				gfx.shadowColor = 'rgba(0,0,0,0)';
 				gfx.shadowBlur = 0;
 				gfx.strokeStyle = gridOverlayColor;
 				gfx.lineWidth = grid.view.gridOverlayWidth;
@@ -407,7 +411,7 @@ grid.updateGridView = function(){
 	// Layer layout and title bars have been updated
 	grid.view.layersNeedUpdate = false;
 	grid.updateTimelineView();
-	
+
 	grid.updateCharts(grid.view.currentTimeFrame, grid.view.viewBuffer);
 }
 
@@ -421,15 +425,15 @@ grid.updateLayersView = function(){
 	var portsDisplayed = 0;
 	for (var z=0; z<grid.model.dimZ; z++ ) // for each layer
 		for (var i=ports.length;i-->0;)	// for each port
-			portsDisplayed += (!grab('Layer'+z+'_Port'+ports[i]).checked || 
-								grab('Layer'+z+'_Port'+ports[i]).disabled)  ? 0:1; 
+			portsDisplayed += (!grab('Layer'+z+'_Port'+ports[i]).checked ||
+								grab('Layer'+z+'_Port'+ports[i]).disabled)  ? 0:1;
 
 	// Reset canvas
 	grid.view.canvy.width  = (grid.model.dimX*SCL+grid.view.barWidth) *
 							 grid.view.layoutColumns - grid.view.barWidth;
-	grid.view.canvy.height = (grid.model.dimY*SCL+grid.view.barHeight)* 
+	grid.view.canvy.height = (grid.model.dimY*SCL+grid.view.barHeight)*
 							 Math.ceil(portsDisplayed/grid.view.layoutColumns);
-			
+
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -459,21 +463,21 @@ grid.updateLayoutColumns = function(){
 }
 
 grid.toggleFixedPrecision = function(){
-	// Only the view settings changed, but the frame data 
+	// Only the view settings changed, but the frame data
 	// remains the same. Just request a redraw.
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
 
 grid.updatePrecision = function(){
-	// Only the view settings changed, but the frame data 
+	// Only the view settings changed, but the frame data
 	// remains the same. Just request a redraw.
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
 
 grid.toggleGridOverlay = function(){
-	// Only the view settings changed, but the frame data 
+	// Only the view settings changed, but the frame data
 	// remains the same. Just request a redraw.
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
@@ -494,14 +498,14 @@ grid.updateTimelineView = function(){
 	}else{
 		seek.stepUp(1); seek.stepDown(1);
 	}
-	
+
 	if(grid.model.data.length){
 		var t = this.model.data[this.view.currentTimeFrame].timestamp; //shorthand
 		grab('timelineStatus').innerHTML = 'Frame: ' + this.view.currentTimeFrame +
 				'&emsp;&emsp; Time: ' + util.padInt2(t[0]) +':'+ util.padInt2(t[1]) + ':' +
 				 					 	util.padInt2(t[2]) +':'+ util.padInt3(t[3]);
 	}
-	// [TODO] Timestamp arithmetic & display 
+	// [TODO] Timestamp arithmetic & display
 	// (although this is just a viewer and should obey sim data source)
 }
 
@@ -567,21 +571,21 @@ grid.initialView = function(){
 grid.toggleUI = function(isEnabled, list){
 	if (list == null) {
 			var list = ['precision','BtnRecord','BtnPlay', 'timelineSeek',
-						  'fixedPrecision', 'precision','loop', 'BtnRewind', 
+						  'fixedPrecision', 'precision','loop', 'BtnRewind',
 						  'BtnPlayBw','BtnStepBw', 'BtnStepFw','BtnLastFrame',
 						  'showValues', 'showGridOverlay', 'layoutColumns', 'showZero'];
 	}
 	else {
 		var list = list;
 	}
-	
+
 	for(var i=list.length;i-->0;)
 		grab(list[i]).disabled = !isEnabled;
 }
 grid.initialView();
 
 // View main
-grid.viewMain = function(){	
+grid.viewMain = function(){
 	grid.setupGrid();
 	grid.setupCharts();
 	grid.updateGridView();
@@ -591,30 +595,30 @@ grid.viewMain = function(){
 grid.getColor = function(value) {
 	for (var i = 0; i < grid.palette.length; i++) {
 		var mmax = grid.palette[i][0];
-		
+
 		if (value < mmax[0] || value >= mmax[1]) continue;
-		
+
 		return d3.color("rgb(" + grid.palette[i][1].join(",") + ")");
 	}
 
 	return d3.color("rgb(255,255,255)");
 }
 
-grid.setupCharts = function() {	
+grid.setupCharts = function() {
 	var radio = grab('Layer_0_Port_0_Chart');
-	
+
 	if (radio) radio.checked = true;
-	
+
 	grid.toggleCharts(0, 0);
 }
 
 grid.toggleCharts = function(z, port) {
 	Viz.Utils.empty("chartsDiv");
-	
+
 	var track = JSON.parse("[" + grab('chart_states').value.replace(/\s/g, '').split(",") + "]");
-	
+
 	var fb = grid.view.viewBuffer;
-	
+
 	Viz.data.Initialize(z, port, track);
 	if(grab('showStateFreq').checked) charts.states = Viz.charting.BuildStatesChart(grab('chartsDiv'), "state", [70, 40, 20, 50]);
 	if(grab('showTransitions').checked) charts.transitions = Viz.charting.BuildTransitionsChart(grab('chartsDiv'), "activity", [50, 50, 50, 50]);
@@ -622,14 +626,14 @@ grid.toggleCharts = function(z, port) {
 	grid.updateGridView();
 }
 
-grid.updateCharts = function(t, fb) {	
+grid.updateCharts = function(t, fb) {
 	Viz.data.UpdateTime(t, fb);
-	
+
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
 }
-  
+
 function getMousePos(canvas, event) {
 	var rect = canvas.getBoundingClientRect();
 	return {
@@ -638,25 +642,62 @@ function getMousePos(canvas, event) {
 	};
 }
 
-var canvas = grid.view.canvy;	
+var canvas = grid.view.canvy;
 var context = canvy.getContext('2d');
 canvas.addEventListener('mousemove', function(event) {
 		var ToolTip = grab('tip'); ToolTip.innerHTML='';
         var mousePos = getMousePos(canvas, event);
-		
+
 		var height = Math.round((canvy.height-40)/grid.model.dimY);
 		var width = Math.round((canvy.width-40)/grid.model.dimX);
-		
+
 		var cellX=Math.round((mousePos.x-5)/width);
 		var cellY=Math.round(mousePos.y/height);
-		
+
 		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
-		
+
 		var message = 'Pos:' + cellX +',' + cellY;
 		ToolTip.innerHTML += message;
 		ToolTip.style.left=(event.pageX)-20 + 'px';
 		ToolTip.style.top=(event.pageY)+23 + 'px';
       }, false);
-	  
+
 function grab(id)	{return document.getElementById(id);}
+
+grid.showPalette = function() {
+		d3.select("#BtnEditPalette").attr("disabled","true").
+		style("display","none");
+		var box = d3.select("#paletteDiv")._groups[0][0] === null ?
+		 d3.select("#chartControls").append("div")
+		.attr("id","paletteDiv")
+		.style("height","150px").style("width","250px")
+		.style("background-color","#2E2E31") :
+		d3.select("#paletteDiv");
+		var table = box.append("table");
+		for (var i=0; i<grid.palette.length;i++){
+				var row = table.append("tr");
+				row.append("td").style("padding-left","10px")
+				.append("label").attr("for","colorWell_"+i)
+				.text("("+grid.palette[i][0][0]+"; "+grid.palette[i][0][1]+")");
+				var color = "#";
+				for (var col of grid.palette[i][1]){
+						let c = col>0 ? col.toString(16) : "00";
+						color += c;
+				}
+				row.append("td").style("padding-left","10px")
+				.append("input").attr("type","color")
+				.attr("value", color)
+				.attr("id","colorWell_"+i);
+		}
+		table.selectAll("input[type=color]").on("change",grid.changePalette);
+}
+
+grid.changePalette = function(event) {
+		let id = d3.event.target.id.split("_")[1];
+		let val = d3.event.target.value;
+		for (var i = 0; i< grid.palette[id][1].length;i++){
+				grid.palette[id][1][i] = parseInt (val.substring(1+i*2,3+2*i),16);
+				console.log("RGB "+i+": "+grid.palette[id][1][i]);
+		}
+}

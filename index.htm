@@ -6,7 +6,7 @@
  * Carleton University, Ottawa, Canada.​​
  * License: GNU General Public License v3.0
  *
- * Project: Web-based Cell-DEVS Visualizer 
+ * Project: Web-based Cell-DEVS Visualizer
  */
 -->
 <!DOCTYPE html>
@@ -24,68 +24,68 @@
             <h3>
 				<a href="http://vs3.sce.carleton.ca/wordpress/" target="_blank">ARSLab</a>
 			</h3>
-			
+
             <h2>
 				<a href="http://cell-devs.sce.carleton.ca/intranet/webviewer/" target="_blank">CellDEVS Simulation Viewer</a>
 			</h2>
-			
-            <span id='alphaTag'><b> alpha</b></span> 
-			
+
+            <span id='alphaTag'><b> alpha</b></span>
+
 			<span id="linksTag">
 				<a href="https://goo.gl/vhQE03" target="_blank">&#128304; tutorials</a> &emsp;
 				<a href="https://goo.gl/S7agHi" target="_blank">&#9733; samples</a> &emsp;
 				<a href="mailto:omar.hesham@carleton.ca?Subject=[CellDEVSViewer][alpha]" target="_blank">&#9749; report a problem </a>
 			</span>
          </div>
-		 
+
          <div id="inputzone">
             <div id="dropzone">
                <div style="text-align: left; margin-left:10px;color:#aaa"><br><b>Input files</b> - Drag and drop or click to browse:<br></div>
-               
+
 			   <div class="dz" id="maFile">
-                  <br>Model <br>(.ma) 
+                  <br>Model <br>(.ma)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="ma-file" multiple />
                   <div class='statBox'></div>
                </div>
-			   
+
                <div class="dz" id="valFile">
                   <br>Initial Values<br> (.val)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="val-file" multiple />
                   <div class='statBox'></div>
                </div>
-			   
+
                <div class="dz" id="logFile">
                   <br>Simulation Log<br> (.log)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="log-file" multiple />
                   <div class='statBox'></div>
                </div>
-			   
+
                <div class="dz" id="paletteFile">
                   <br>Color Palette<br> (.pal)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="pal-file" multiple />
                   <div class='statBox'></div>
                </div>
-			   
+
                <br><br>
                &emsp;
-               <button onclick="grid.loadSimulation()" id="BtnParseY">Load Simulation</button> 
+               <button onclick="grid.loadSimulation()" id="BtnParseY">Load Simulation</button>
                <br><br>
             </div>
          </div>
-		 
+
          <div id="LayersDiv">
             &nbsp;&#8801; Detected layers:
             <div id="LayersList"></div>
          </div>
       </div>
-	  
+
       <div id="controls">
 	<div class ='rowDiv'>Chart Selection:
 	  		<label><input type="checkbox" id="showStateFreq" >States Frequency</label> <span class="vsep"></span>
 			<label><input type="checkbox" id="showTransitions" >Transitions</label> <span class="vsep"></span>
 			<label><input type="checkbox" id="showStats" >Statistics</label>
 		 </div>
-		
+
          <div class='rowDiv'>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
             <label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" >Fixed</label> <span class="vsep"></span>
             <label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues">Show values</label>
@@ -94,46 +94,47 @@
             <div style="display:none;"><span class="vsep"></span>
             Layout columns: <input type="number" value="1" id="layoutColumns" step='1' min="1" oninput="grid.updateLayoutColumns()" /></div>
          </div>
-		 
+
          <div class='rowDiv'>
             <span id="timelineControls">
             <button id="BtnRewind"		onclick="grid.rewindPlayback();"><B>I</B>&#x25C0;</button>
             <button id="BtnPlayBw"		onclick="grid.playFramesBackwards()">&#x25C1;&#x25C1;</button>
             <button id="BtnStepBw"		onclick="grid.pausePlayback();grid.prevFrame()">&#x25C1;<B>I</B></button>
             <button id="BtnPlay"		onclick="grid.playFrames()">&#x25B6;</button>
-            <button id="BtnStepFw"		onclick="grid.pausePlayback();grid.nextFrame()"><B>I</B>&#x25B6;</button> 
-            <button id="BtnLastFrame"	onclick="grid.lastFrame()">&#x25B6;<B>I</B></button> 
-            <input type="range" id="timelineSeek" oninput='grid.seekTimeline()' onchange="grid.seekTimeline()" min="0" max="1" > 
+            <button id="BtnStepFw"		onclick="grid.pausePlayback();grid.nextFrame()"><B>I</B>&#x25B6;</button>
+            <button id="BtnLastFrame"	onclick="grid.lastFrame()">&#x25B6;<B>I</B></button>
+            <input type="range" id="timelineSeek" oninput='grid.seekTimeline()' onchange="grid.seekTimeline()" min="0" max="1" >
             </span>
             <label><input onclick="grid.toggleLoop()" type="checkbox" id="loop">Loop</label> <span class="vsep"></span>
             <div id="timelineStatus">Frame: 0 &emsp; Time: --:--:--:---</div>
          </div>
-		 
+
          <div class='rowDiv'>
             Pixels/cell (zoom):<input type="number" value="25" id="cellScale" step="1" min="1" max="500" oninput="grid.reCSSGrid(this)" />
             <span class="vsep"></span>
             Framerate (fps): <input type="number" value="15" id="framerate" min="1" max="500" oninput="grid.updateFPS()" /><span class="vsep"></span>
             <button onclick="grid.recordFrames()" id="BtnRecord"><b style="color:#A44A4A">&#x25cf;</b> Record Video</button>
             <span class="hideMe">Quality (0 - 1):<input type="number" value="0.95" id="vidQual" step=".05" min="0" max="1"/></span>
-            <span id="videoLink" style="display:none">&nbsp;&nbsp;Video ready: <a id="videoViewLink" style="display:none;color:#AB7D6C;">watch &#x1f3a5;</a> | 
+            <span id="videoLink" style="display:none">&nbsp;&nbsp;Video ready: <a id="videoViewLink" style="display:none;color:#AB7D6C;">watch &#x1f3a5;</a> |
             <a id="videoDownloadLink" style="display:none;color:#AB7D6C;">download &#8681;</a>
             </span>
          </div>
       </div>
-	
+
 	  <div id="chartControls">
-		
+
          <div class='rowDiv'>Track States:  <input type="text" value="1,2,3,4,5,6,7" id="chart_states" /></div>
+         <button onclick="grid.showPalette()" id="BtnEditPalette" style="display: none">Edit Palette</button>
 	  </div>
    </div>
-   
+
    <div id="chartsDiv" class="charts-container"></div>
-   
+
    <div id="canvyDiv" style="display: none">
       <canvas id="canvy" style= "display: none"></canvas>
 	  <div id=tip></div>
    </div>
-   
+
 
    <script src="references/whammy.js"></script>
    <script src="references/d3-4.12.0/d3.min.js"></script>
@@ -142,10 +143,10 @@
    <script src="src/model.js"></script>
    <script src="src/charting.js"></script>
    <script src="src/recording.js"></script>
-   
+
    <footer>
-      <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> | 
-      <a href='#'>Bruno St-Aubin</a> | 
+      <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> |
+      <a href='#'>Bruno St-Aubin</a> |
       <a href='http://cell-devs.sce.carleton.ca/ars/' target='_blank'>ARS Lab</a> |
       <a href='http://carleton.ca' target='_blank'>Carleton University</a><br>
       <code>Viscrete API v0.080 (<a href='changelog.htm' target='_blank'>changelog</a>)</code>
