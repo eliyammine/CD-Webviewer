@@ -486,8 +486,11 @@ html[data-UA*='Mac OS'] #gridOverlayColor
 
 #tip {
   position: absolute;
-  background: white;
-  border: 1px solid blue;
+  background: black;
+  color: #fff;
+  padding: 5px 0;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /* Implement the color pallete as a set of CSS classes */
@@ -534,6 +537,7 @@ input[type=range]#timelineSeek::-moz-range-track{
   background: repeating-linear-gradient(90deg,#48494D,#48494D 20px,#414146 20px,#414146 22px);
   border-radius: 0px;
   border: 0px solid #010101;
+  box-shadow: inset 1.3px 1.3px 4.6px #000000, 0px 0px 1.3px #0d0d0d;
   box-shadow: inset 1.3px 1.3px 4.6px #000000, 0px 0px 1.3px #0d0d0d;
   height: 18px;
   width: 200px;

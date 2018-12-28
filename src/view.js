@@ -56,7 +56,6 @@ grid.view.frameTimer = 0;
 grid.view.gfx;
 grid.view.redrawRequested = true;
 SCL = grab('cellScale').value;
-AxisCanvas=1;
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -72,7 +71,6 @@ grid.loadSimulation = function(){
 		alert("Please select a simulation log.")
 		return;
 	}
-	AxisCanvas=1;
 	grid.pausePlayback();
 	grab('BtnParseY').style.background = 'rgba(35,112,77, 0.5)';
 	grab('BtnParseY').disabled = true;
@@ -118,8 +116,8 @@ grid.setupGrid = function(){
 	grid.view.gfx = canvy.getContext('2d');
 	var nGrid = gridData.dimZ*(grid.model.ports.length-skipOut);
 
-	canvy.width = (gridData.dimX*SCL+grid.view.barWidth) * grid.view.layoutColumns - grid.view.barWidth+40;
-	canvy.height= (gridData.dimY*SCL+grid.view.barHeight)* Math.ceil(nGrid/grid.view.layoutColumns)+40;
+	canvy.width = (gridData.dimX*SCL+grid.view.barWidth) * grid.view.layoutColumns - grid.view.barWidth;
+	canvy.height= (gridData.dimY*SCL+grid.view.barHeight)* Math.ceil(nGrid/grid.view.layoutColumns);
 
 	// Signal that layers need to be redrawn
 	grid.view.layersNeedUpdate = true;
@@ -369,7 +367,6 @@ grid.updateGridView = function(){
 				gfx.shadowBlur = 0;
 				gfx.strokeStyle = gridOverlayColor;
 				gfx.lineWidth = grid.view.gridOverlayWidth;
-				var count =grid.model.dimY-1;
 				// horizontal grid lines
 				for(var y=grid.model.dimY+1; y-->0;){
 					// See this for why 0.5: http://goo.gl/EpuqLl
@@ -378,33 +375,15 @@ grid.updateGridView = function(){
 					gfx.lineTo(layerPosX+layerWidth, layerPosY+y*SCL+(y!=grid.model.dimY?0.5:-0.5));
 					gfx.closePath();
 					gfx.stroke();
-					if (y>0 && AxisCanvas==1)  {
-						gfx.fillStyle = "white";
-						gfx.fillText(count,canvy.width-26, layerPosY+y*SCL+(y!=grid.model.dimY?0.5:-0.5)-18);
-					};
-					count--;
 				}
 				// vertical grid lines
-				count =grid.model.dimX-1;
 				for(var x=grid.model.dimX+1; x-->0;){
 					gfx.beginPath();
 					gfx.moveTo(layerPosX+x*SCL+(x!=grid.model.dimX?0.5:-0.5), layerPosY);
 					gfx.lineTo(layerPosX+x*SCL+(x!=grid.model.dimX?0.5:-0.5), layerPosY+layerHeight);
 					gfx.closePath();
 					gfx.stroke();
-					if (x>0 && AxisCanvas==1) {
-						gfx.fillStyle = "white";
-						gfx.fillText(count,layerPosX+x*SCL+(x!=grid.model.dimX?0.5:-0.5)-17, canvy.height-26);
-					};
-					count--;
 				}
-				if(AxisCanvas==1) {
-					gfx.fillText("",canvy.width/2-grid.model.dimX,canvy.height-2);
-					gfx.fillText("",canvy.width-6,canvy.height/2-grid.model.dimY+4);
-					gfx.fillText("X",canvy.width/2-grid.model.dimX,canvy.height-2);
-					gfx.fillText("Y",canvy.width-6,canvy.height/2-grid.model.dimY+4);
-				}
-				AxisCanvas =0;
 			}
 		}
 	}
@@ -589,6 +568,7 @@ grid.viewMain = function(){
 	grid.setupGrid();
 	grid.setupCharts();
 	grid.updateGridView();
+	grid.statesList();
 }
 
 // Bruno's Stuff
@@ -614,10 +594,8 @@ grid.setupCharts = function() {
 
 grid.toggleCharts = function(z, port) {
 	Viz.Utils.empty("chartsDiv");
-
+	
 	var track = JSON.parse("[" + grab('chart_states').value.replace(/\s/g, '').split(",") + "]");
-
-	var fb = grid.view.viewBuffer;
 
 	Viz.data.Initialize(z, port, track);
 	if(grab('showStateFreq').checked) charts.states = Viz.charting.BuildStatesChart(grab('chartsDiv'), "state", [70, 40, 20, 50]);
@@ -643,26 +621,41 @@ function getMousePos(canvas, event) {
 }
 
 var canvas = grid.view.canvy;
-var context = canvy.getContext('2d');
 canvas.addEventListener('mousemove', function(event) {
-		var ToolTip = grab('tip'); ToolTip.innerHTML='';
+		var ToolTip = grab('tip'); ToolTip.innerHTML=''; ToolTip.style.visibility = "visible";
         var mousePos = getMousePos(canvas, event);
+		
+		var portID = 0;
+		var layer =0;
+		var fb = grid.view.viewBuffer;
+		
+		var height = Math.round((canvy.height)/(grid.model.dimY));
+		var width = Math.round((canvy.width)/(grid.model.dimX));
 
-		var height = Math.round((canvy.height-40)/grid.model.dimY);
-		var width = Math.round((canvy.width-40)/grid.model.dimX);
+		var cellX=Math.round((mousePos.x-20)/width);
+		var cellY=Math.round((mousePos.y)/height);
 
-		var cellX=Math.round((mousePos.x-5)/width);
-		var cellY=Math.round(mousePos.y/height);
-
+		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
+			cellY=cellY - grid.model.dimY -1;
+			layer +=1;
+		}
 		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
+		if (cellX == -1) cellX =0;
+		if (cellY == -1) cellY =0;
 
-		var message = 'Pos:' + cellX +',' + cellY;
+		var message = 'Pos(X, Y, Z): (' + cellX +',' + cellY +','+layer+')<br>';
+		message += 'State: ' + fb[layer][cellY][cellX][portID]+'<br>';
+		message += 'Transitions:' + Viz.data.transitions[cellX][cellY];
 		ToolTip.innerHTML += message;
 		ToolTip.style.left=(event.pageX)-20 + 'px';
 		ToolTip.style.top=(event.pageY)+23 + 'px';
       }, false);
 
+canvas.addEventListener('mouseout', function(event) {	  
+	var ToolTip = grab('tip'); ToolTip.style.visibility = "hidden";
+	}, false);
+	
 function grab(id)	{return document.getElementById(id);}
 
 grid.showPalette = function() {
@@ -700,4 +693,17 @@ grid.changePalette = function(event) {
 				grid.palette[id][1][i] = parseInt (val.substring(1+i*2,3+2*i),16);
 				console.log("RGB "+i+": "+grid.palette[id][1][i]);
 		}
+}
+
+grid.statesList = function() {
+	states=grab('chart_states');
+	track = "";
+	for (var i=0; i<grid.palette.length;i++){
+			if  (track.indexOf(grid.palette[i][0][0]) ==-1) track+= grid.palette[i][0][0] +',';
+			if  (track.indexOf(grid.palette[i][0][1]) ==-1) track+= grid.palette[i][0][1] + ',';
+	}
+	track=track.substring(0,track.length-1);
+	
+	console.log(track);
+	states.value = track;
 }
