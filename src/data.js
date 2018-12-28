@@ -34,7 +34,7 @@ inp.processDroppedFiles = function(f){
 			inp.logFile = file;
 			inp.logLoaded = true;
 			
-			box.innerHTML = file.name+'<br><b>Ready to parse</b>';
+			box.innerHTML = file.name+'<font color=#f7c933><br><b>Ready to parse</b></font>';
 		}
 		else processFile(box, m[1], file);
 		
@@ -46,7 +46,7 @@ inp.processDroppedFiles = function(f){
 	function processFile(box, ext, file) {
 		var fId = ext + "-file";
 
-		box.innerHTML = file.name + '<br><b>Processing...</b>';	// indicate file started processing
+		box.innerHTML = file.name + '<font color=yellow><br><b>Processing...</b></font>';	// indicate file started processing
 		
 		var fReader = new FileReader();
 
@@ -55,7 +55,7 @@ inp.processDroppedFiles = function(f){
 		fReader.onloadend = function(){ 
 			inp.file[fId] = fReader.result; 
 			
-			box.innerHTML = file.name + '<br><b>Loaded!!</b>'; 	// indicate file loaded
+			box.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 	// indicate file loaded
 		}		
 	}
 }
@@ -128,7 +128,7 @@ inp.parseYChunks = function(){
 		// Check end of file
 		if(C.end > C.file.size || C.end > inp.MAXFILESIZE){	// TEST ONLY: limit to 6GB
 			grid.parseYMessages(C.chunkContent, safeEndIndex,true);		// signal lastChunk=true	
-			statBox.innerHTML = C.file.name+'<br><b>All parsed!</b>';
+			statBox.innerHTML = C.file.name+'<font color = green><br><b>All parsed!</b></font>';
 			inp.logParsed = true;
 			grab('BtnParseY').style.background = '';
 			grab('BtnParseY').disabled = false;

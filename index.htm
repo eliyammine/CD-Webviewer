@@ -81,9 +81,9 @@
 
       <div id="controls">
 	<div class ='rowDiv'>Chart Selection:
-	  		<label><input type="checkbox" id="showStateFreq" >States Frequency</label> <span class="vsep"></span>
-			<label><input type="checkbox" id="showTransitions" >Transitions</label> <span class="vsep"></span>
-			<label><input type="checkbox" id="showStats" >Statistics</label>
+	  		<label><input type="checkbox" id="showStateFreq" checked>States Frequency</label> <span class="vsep"></span>
+			<label><input type="checkbox" id="showTransitions" checked>Transitions</label> <span class="vsep"></span>
+			<label><input type="checkbox" id="showStats" checked>Statistics</label>
 		 </div>
 
          <div class='rowDiv'>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
@@ -123,7 +123,7 @@
 
 	  <div id="chartControls">
 
-         <div class='rowDiv'>Track States:  <input type="text" value="1,2,3,4,5,6,7" id="chart_states" /></div>
+         <div class='rowDiv'>Track States:  <input type="text" value="" id="chart_states" /></div>
          <button onclick="grid.showPalette()" id="BtnEditPalette" style="display: none">Edit Palette</button>
 	  </div>
    </div>

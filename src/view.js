@@ -628,17 +628,21 @@ canvas.addEventListener('mousemove', function(event) {
 		var portID = 0;
 		var layer =0;
 		var fb = grid.view.viewBuffer;
-		
-		var height = Math.round((canvy.height)/(grid.model.dimY));
+		console.log(grid.model.dimZ);
+
+		var height = Math.round((canvy.height)/(grid.model.dimY*grid.model.dimZ));
 		var width = Math.round((canvy.width)/(grid.model.dimX));
 
 		var cellX=Math.round((mousePos.x-20)/width);
 		var cellY=Math.round((mousePos.y)/height);
 
+			
 		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
+			cellY=Math.round((mousePos.y+15)/height);
 			cellY=cellY - grid.model.dimY -1;
 			layer +=1;
 		}
+		
 		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
 		if (cellX == -1) cellX =0;
@@ -703,7 +707,5 @@ grid.statesList = function() {
 			if  (track.indexOf(grid.palette[i][0][1]) ==-1) track+= grid.palette[i][0][1] + ',';
 	}
 	track=track.substring(0,track.length-1);
-	
-	console.log(track);
 	states.value = track;
 }
