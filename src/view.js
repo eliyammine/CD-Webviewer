@@ -631,7 +631,6 @@ canvas.addEventListener('mousemove', function(event) {
 		var portID = 0;
 		var layer =0;
 		var fb = grid.view.viewBuffer;
-		console.log(grid.model.dimZ);
 
 		var height = Math.round((canvy.height/scale)/(grid.model.dimY*grid.model.dimZ));
 		var width = Math.round((canvy.width/scale)/(grid.model.dimX));
