@@ -56,6 +56,9 @@ grid.view.frameTimer = 0;
 grid.view.gfx;
 grid.view.redrawRequested = true;
 SCL = grab('cellScale').value;
+scale = 1;
+origin_x=0;
+origin_y=0;
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -202,7 +205,7 @@ grid.updateGridView = function(){
 
 		// Use canvas div bg color instead
 		gfx.fillStyle = window.getComputedStyle(canvyDiv).getPropertyValue('background-color');
-		gfx.fillRect(0,0,canvy.width,canvy.height);
+		gfx.fillRect(origin_x,origin_y,canvy.width/scale,canvy.height/scale);
 	}
 
 	// Is this frame cached? (i.e. last or multiple of caching period)
@@ -615,7 +618,7 @@ grid.updateCharts = function(t, fb) {
 function getMousePos(canvas, event) {
 	var rect = canvas.getBoundingClientRect();
 	return {
-		x: Math.round(event.clientX - rect.left ),
+		x: Math.round(event.clientX - rect.left),
 		y: Math.round(event.clientY - rect.top)
 	};
 }
@@ -630,11 +633,11 @@ canvas.addEventListener('mousemove', function(event) {
 		var fb = grid.view.viewBuffer;
 		console.log(grid.model.dimZ);
 
-		var height = Math.round((canvy.height)/(grid.model.dimY*grid.model.dimZ));
-		var width = Math.round((canvy.width)/(grid.model.dimX));
+		var height = Math.round((canvy.height/scale)/(grid.model.dimY*grid.model.dimZ));
+		var width = Math.round((canvy.width/scale)/(grid.model.dimX));
 
 		var cellX=Math.round((mousePos.x-20)/width);
-		var cellY=Math.round((mousePos.y)/height);
+		var cellY=Math.round((mousePos.y-18)/height);
 
 			
 		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
@@ -652,13 +655,35 @@ canvas.addEventListener('mousemove', function(event) {
 		message += 'State: ' + fb[layer][cellY][cellX][portID]+'<br>';
 		message += 'Transitions:' + Viz.data.transitions[cellX][cellY];
 		ToolTip.innerHTML += message;
-		ToolTip.style.left=(event.pageX)-20 + 'px';
+		ToolTip.style.left=(event.pageX)-85 + 'px';
 		ToolTip.style.top=(event.pageY)+23 + 'px';
-      }, false);
+		}, false);
 
 canvas.addEventListener('mouseout', function(event) {	  
 	var ToolTip = grab('tip'); ToolTip.style.visibility = "hidden";
 	}, false);
+
+	
+canvas.addEventListener('mousemove', showZoom, false);
+canvas.addEventListener('mouseover', showZoom, false);
+function showZoom(event) {
+	var zoom=grab("zoom");
+	var zoomCtx=zoom.getContext("2d");
+	var mousePos = getMousePos(canvas, event);
+	 
+	zoomCtx.fillStyle = "white";
+	zoomCtx.fillRect(0,0, zoom.width, zoom.height);
+	zoomCtx.drawImage(canvas, mousePos.x-40, mousePos.y-40, 400, 400,0,0, zoom.width*2, zoom.height*2);
+	zoom.style.top = event.pageY + 10 + "px"
+	zoom.style.left = event.pageX + 40 + "px"
+	zoom.style.display = "block";
+}
+	
+canvyDiv = grid.view.canvyDiv
+canvyDiv.addEventListener("mouseout", function(){
+    zoom.style.display = "none";
+});
+	
 	
 function grab(id)	{return document.getElementById(id);}
 

@@ -217,6 +217,10 @@ label{
 	white-space: nowrap;
     vertical-align: top;
 }
+#zoom{
+   border:1px black solid;
+   box-shadow: 5px 5px 10px #1e1e1e;
+}
 
 .charts-container {
 	
