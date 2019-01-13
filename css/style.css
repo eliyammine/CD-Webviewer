@@ -222,6 +222,10 @@ label{
    box-shadow: 5px 5px 10px #1e1e1e;
 }
 
+#zoomButton{
+	position: relative;
+}
+
 .charts-container {
 	
     height: auto;

@@ -59,6 +59,7 @@ SCL = grab('cellScale').value;
 scale = 1;
 origin_x=0;
 origin_y=0;
+var zoomStatus = false;
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -659,30 +660,48 @@ canvas.addEventListener('mousemove', function(event) {
 		}, false);
 
 canvas.addEventListener('mouseout', function(event) {	  
-	var ToolTip = grab('tip'); ToolTip.style.visibility = "hidden";
+	var ToolTip = grab('tip'); 
+	ToolTip.style.visibility = "hidden";
 	}, false);
 
 	
 canvas.addEventListener('mousemove', showZoom, false);
 canvas.addEventListener('mouseover', showZoom, false);
 function showZoom(event) {
-	var zoom=grab("zoom");
-	var zoomCtx=zoom.getContext("2d");
-	var mousePos = getMousePos(canvas, event);
+	if (zoomStatus) {
+		var zoom=grab("zoom");
+		var zoomCtx=zoom.getContext("2d");
+		var mousePos = getMousePos(canvas, event);
 	 
-	zoomCtx.fillStyle = "white";
-	zoomCtx.fillRect(0,0, zoom.width, zoom.height);
-	zoomCtx.drawImage(canvas, mousePos.x-40, mousePos.y-40, 400, 400,0,0, zoom.width*2, zoom.height*2);
-	zoom.style.top = event.pageY + 10 + "px"
-	zoom.style.left = event.pageX + 40 + "px"
-	zoom.style.display = "block";
+		zoomCtx.fillStyle = "white";
+		zoomCtx.fillRect(0,0, zoom.width, zoom.height);
+		zoomCtx.drawImage(canvas, mousePos.x-40, mousePos.y-40, 400, 400,0,0, zoom.width*2, zoom.height*2);
+		zoom.style.top = event.pageY + 10 + "px"
+		zoom.style.left = event.pageX + 40 + "px"
+		zoom.style.display = "block";
+	}
 }
 	
 canvyDiv = grid.view.canvyDiv
 canvyDiv.addEventListener("mouseout", function(){
     zoom.style.display = "none";
 });
-	
+
+function toggleZoom() {
+	var zoomButton = grab("zoomButton");
+	console.log(zoomStatus);
+	var buttonColor=window.getComputedStyle(zoomButton,null).getPropertyValue("background-color");
+	console.log(buttonColor);
+	if (zoomButton.style.backgroundColor=='red') {
+		console.log("here");
+		zoomButton.style.backgroundColor='green';
+		zoomStatus=true;
+	}
+	else {
+		zoomButton.style.backgroundColor='red';
+		zoomStatus=false;
+	}
+};
 	
 function grab(id)	{return document.getElementById(id);}
 
