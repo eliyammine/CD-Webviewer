@@ -128,7 +128,7 @@ grid.setupGrid = function(){
 
 	// Renable timeline controls
 	grid.toggleUI(true);
-	if(grab('showValues').checked) 		grid.toggleUI(true, ['showZero']);
+	if(grab('showValues').checked) 		grid.toggleUI(true, ['showZero', 'fixedPrecision']);
 	if(grab('showGridOverlay').checked) grid.toggleUI(true, ['gridOverlayColor']);
 
 	// Disable random access and backwards playback if cache is disabled
@@ -505,6 +505,7 @@ grid.updateFPS = function(){
 grid.toggleValueDisplay = function(){
 	this.view.valueDisplay = !this.view.valueDisplay;
 	grab('showZero').disabled = !this.view.valueDisplay;
+	grab('fixedPrecision').disabled = !this.view.valueDisplay;
 
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
