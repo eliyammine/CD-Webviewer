@@ -689,11 +689,7 @@ canvyDiv.addEventListener("mouseout", function(){
 
 function toggleZoom() {
 	var zoomButton = grab("zoomButton");
-	console.log(zoomStatus);
-	var buttonColor=window.getComputedStyle(zoomButton,null).getPropertyValue("background-color");
-	console.log(buttonColor);
 	if (zoomButton.style.backgroundColor=='red') {
-		console.log("here");
 		zoomButton.style.backgroundColor='green';
 		zoomStatus=true;
 	}
