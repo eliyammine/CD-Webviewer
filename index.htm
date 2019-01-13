@@ -122,7 +122,6 @@
       </div>
 
 	  <div id="chartControls">
-
          <div class='rowDiv'>Track States:  <input type="text" value="" id="chart_states" /></div>
          <button onclick="grid.showPalette()" id="BtnEditPalette" style="display: none">Edit Palette</button>
 	  </div>
@@ -130,7 +129,10 @@
 
    <div id="chartsDiv" class="charts-container"></div>
    <div id="canvyDiv" style="display: none">
-   	  <button type='button' id=zoomButton style=float:right;background-color:red; onclick="toggleZoom()";>&#x1F50D;</button>
+   <div class="canvas-btn-container">
+   	  <button type='button' title="Zoom on cells" class="button" id=zoomButton style="background-color:red"; onclick="toggleZoom()";>&#x1F50D;</button>
+	  <button type='button' title="Information Tooltip" class="button" id=tipButton  style="background-color:red"; onclick="toggleTip()";>&#x1f6c8;</button>
+	</div>
       <canvas id="canvy" style= "display: none"></canvas>
 	  <canvas id="zoom" width= "400" height="400" style="position:absolute; top:0; left:0; display:none"></canvas>
 	  <div id=tip></div>

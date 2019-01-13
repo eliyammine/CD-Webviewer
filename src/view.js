@@ -60,6 +60,7 @@ scale = 1;
 origin_x=0;
 origin_y=0;
 var zoomStatus = false;
+var tipStatus = false;
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -627,6 +628,7 @@ function getMousePos(canvas, event) {
 
 var canvas = grid.view.canvy;
 canvas.addEventListener('mousemove', function(event) {
+	if (tipStatus) {
 		var ToolTip = grab('tip'); ToolTip.innerHTML=''; ToolTip.style.visibility = "visible";
         var mousePos = getMousePos(canvas, event);
 		
@@ -658,12 +660,25 @@ canvas.addEventListener('mousemove', function(event) {
 		ToolTip.innerHTML += message;
 		ToolTip.style.left=(event.pageX)-85 + 'px';
 		ToolTip.style.top=(event.pageY)+23 + 'px';
-		}, false);
+	}
+}, false);
 
 canvas.addEventListener('mouseout', function(event) {	  
 	var ToolTip = grab('tip'); 
 	ToolTip.style.visibility = "hidden";
 	}, false);
+
+function toggleTip() {
+	var tipButton = grab("tipButton");
+	if (tipButton .style.backgroundColor=='red') {
+		tipButton .style.backgroundColor='green';
+		tipStatus=true;
+	}
+	else {
+		tipButton .style.backgroundColor='red';
+		tipStatus=false;
+	}
+};
 
 	
 canvas.addEventListener('mousemove', showZoom, false);
