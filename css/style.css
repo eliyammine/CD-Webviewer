@@ -233,9 +233,14 @@ label{
 	position: relative;
 	width: 30px;
 	height: 30px;
+	padding:0;
 	float: right;
+	line-height: 0.5;
 }
 
+#tipButton{
+	font-size: 25px;
+}	
 .charts-container {
 	
     height: auto;
