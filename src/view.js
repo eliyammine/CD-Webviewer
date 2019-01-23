@@ -571,10 +571,10 @@ grid.initialView();
 
 // View main
 grid.viewMain = function(){
+	grid.statesList();
 	grid.setupGrid();
 	grid.setupCharts();
 	grid.updateGridView();
-	grid.statesList();
 }
 
 // Bruno's Stuff
