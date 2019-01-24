@@ -600,7 +600,7 @@ grid.setupCharts = function() {
 
 grid.toggleCharts = function(z, port) {
 	Viz.Utils.empty("chartsDiv");
-	
+
 	var track = JSON.parse("[" + grab('chart_states').value.replace(/\s/g, '').split(",") + "]");
 
 	Viz.data.Initialize(z, port, track);
@@ -631,7 +631,7 @@ canvas.addEventListener('mousemove', function(event) {
 	if (tipStatus) {
 		var ToolTip = grab('tip'); ToolTip.innerHTML=''; ToolTip.style.visibility = "visible";
         var mousePos = getMousePos(canvas, event);
-		
+
 		var portID = 0;
 		var layer =0;
 		var fb = grid.view.viewBuffer;
@@ -642,13 +642,13 @@ canvas.addEventListener('mousemove', function(event) {
 		var cellX=Math.round((mousePos.x-20)/width);
 		var cellY=Math.round((mousePos.y-18)/height);
 
-			
+
 		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
 			cellY=Math.round((mousePos.y+15)/height);
 			cellY=cellY - grid.model.dimY -1;
 			layer +=1;
 		}
-		
+
 		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
 		if (cellX == -1) cellX =0;
@@ -663,8 +663,8 @@ canvas.addEventListener('mousemove', function(event) {
 	}
 }, false);
 
-canvas.addEventListener('mouseout', function(event) {	  
-	var ToolTip = grab('tip'); 
+canvas.addEventListener('mouseout', function(event) {
+	var ToolTip = grab('tip');
 	ToolTip.style.visibility = "hidden";
 	}, false);
 
@@ -680,7 +680,7 @@ function toggleTip() {
 	}
 };
 
-	
+
 canvas.addEventListener('mousemove', showZoom, false);
 canvas.addEventListener('mouseover', showZoom, false);
 function showZoom(event) {
@@ -688,7 +688,7 @@ function showZoom(event) {
 		var zoom=grab("zoom");
 		var zoomCtx=zoom.getContext("2d");
 		var mousePos = getMousePos(canvas, event);
-	 
+
 		zoomCtx.fillStyle = "white";
 		zoomCtx.fillRect(0,0, zoom.width, zoom.height);
 		zoomCtx.drawImage(canvas, mousePos.x-40, mousePos.y-40, 400, 400,0,0, zoom.width*2, zoom.height*2);
@@ -697,7 +697,7 @@ function showZoom(event) {
 		zoom.style.display = "block";
 	}
 }
-	
+
 canvyDiv = grid.view.canvyDiv
 canvyDiv.addEventListener("mouseout", function(){
     zoom.style.display = "none";
@@ -714,7 +714,7 @@ function toggleZoom() {
 		zoomStatus=false;
 	}
 };
-	
+
 function grab(id)	{return document.getElementById(id);}
 
 grid.showPalette = function() {
@@ -724,7 +724,8 @@ grid.showPalette = function() {
 		 d3.select("#chartControls").append("div")
 		.attr("id","paletteDiv")
 		.style("height","150px").style("width","250px")
-		.style("background-color","#2E2E31") :
+		.style("background-color","#2E2E31").
+    style("overflow-y","scroll") :
 		d3.select("#paletteDiv");
 		var table = box.append("table");
 		for (var i=0; i<grid.palette.length;i++){
