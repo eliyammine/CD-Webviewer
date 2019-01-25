@@ -87,9 +87,9 @@
 		 </div>
 
          <div class='rowDiv'>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
-		    &nbsp;<label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues">Show values</label><span class="vsep"></span>
-            <label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" >Fixed</label> <span class="vsep"></span>
-            <label><input onclick="grid.toggleZeroDisplay()" type="checkbox" id="showZero" >Zeroes</label> <span class="vsep"></span>
+		    &nbsp;<label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues" disabled>Show values</label><span class="vsep"></span>
+            <label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" disabled>Fixed</label> <span class="vsep"></span>
+            <label><input onclick="grid.toggleZeroDisplay()" type="checkbox" id="showZero" disabled>Zeroes</label> <span class="vsep"></span>
             <label><input onclick="grid.toggleGridOverlay()" type="checkbox" id="showGridOverlay">Grid overlay</label> <input type="color" id="gridOverlayColor" value="#787882" oninput='grid.updateGridOverlayColor()'>
             <div style="display:none;"><span class="vsep"></span>
             Layout columns: <input type="number" value="1" id="layoutColumns" step='1' min="1" oninput="grid.updateLayoutColumns()" /></div>

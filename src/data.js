@@ -46,7 +46,7 @@ inp.processDroppedFiles = function(f){
 	function processFile(box, ext, file) {
 		var fId = ext + "-file";
 
-		box.innerHTML = file.name + '<font color=yellow><br><b>Processing...</b></font>';	// indicate file started processing
+		box.innerHTML = file.name + '<font color=#f7c933><br><b>Processing...</b></font>';	// indicate file started processing
 		
 		var fReader = new FileReader();
 

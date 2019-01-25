@@ -22,6 +22,7 @@ charts.states = null;
 charts.transitions = null;
 
 /** Global grid object {model, view, data} \*/
+//model
 grid.model = {};
 grid.model.name = 'CellDevsModel';	// Model Name (ID)
 grid.model.dimX = 1;	// Rows
@@ -29,6 +30,8 @@ grid.model.dimY = 1;	// Columns
 grid.model.dimZ = 1; 	// Depth
 grid.model.frameCount = 0; // start with frame 0
 grid.model.updatePacketsPipe = [];
+
+//data for canvas
 grid.view = {};
 grid.view.viewBuffer = [];	// stores full frame copy of current view frame
 grid.view.dataCache = []; // stores periodic snapshots of frames to allow random seeking
@@ -36,31 +39,29 @@ grid.view.CACHE_PERIOD = 10;	// Store a cache point once every 10 frames
 grid.view.CACHE_ENABLED = true;
 grid.view.SHOW_CACHE_ONLY = false;
 grid.view.cacheCount = 0;
-//grid.view.cacheID = true;		// id of cache frames (e.g. 0:0, 10:1, 20:2, etc)
 grid.view.currentTimeFrame = 1;
+ 
+//canvas
 grid.view.div = grab('grid');
 grid.view.valueDisplay = grab('showValues').checked;
-grid.view.zeroDisplay = grab('showZero').checked;
-grid.view.timeline = grab('timeline');
 grid.view.canvy = grab('canvy');
 grid.view.canvyDiv = grab('canvyDiv');
+
 grid.view.barHeight = 20; //pixels
 grid.view.barWidth = 15;
 grid.view.layoutColumns = 1; // columns of port layers
 grid.view.layersNeedUpdate = true;
 grid.view.gridOverlayWidth = 1;
-grid.view.playbackHandle = 0;
-grid.view.playbackDirection = 0; // 0: paused, 1: forwards, 2: backwards
-grid.view.FPS = 1000/ grab('framerate').value;
-grid.view.frameTimer = 0;
-grid.view.gfx;
 grid.view.redrawRequested = true;
+
 SCL = grab('cellScale').value;
+
+//Zoom and tooltip
 scale = 1;
 origin_x=0;
 origin_y=0;
-var zoomStatus = false;
-var tipStatus = false;
+zoomStatus = false;
+tipStatus = false;
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -182,7 +183,7 @@ grid.updateGridView = function(){
 		barW 			= grid.view.barWidth,
 		cols 			= grid.view.layoutColumns,
 		gfx 			= grid.view.gfx,
-		vDisplay		= grid.view.valueDisplay,
+		vDisplay		= grab('showValues').checked,
 		zeroDisplay 	= grid.view.zeroDisplay,
 		fb 				= grid.view.viewBuffer,
 		dc 				= grid.view.dataCache
@@ -203,8 +204,6 @@ grid.updateGridView = function(){
 	// Clear entire grid if layers need update
 	if(grid.view.layersNeedUpdate){
 		// Transparent pixels break Whammy encoder
-		//gfx.clearRect(0, 0,canvy.width,canvy.height);
-
 		// Use canvas div bg color instead
 		gfx.fillStyle = window.getComputedStyle(canvyDiv).getPropertyValue('background-color');
 		gfx.fillRect(origin_x,origin_y,canvy.width/scale,canvy.height/scale);
@@ -359,8 +358,6 @@ grid.updateGridView = function(){
 						if(v==0)
 							gfx.fillText((zeroDisplay ? 0:''),(SCL/2)+posX,(SCL/1.3)+posY, SCL) ;
 						else
-							// because Math.trunc() not yet supported by chrome, we do this:
-							//gfx.fillText((v<0 ? Math.ceil(v) : Math.floor(v)),(SCL/2)+posX,(SCL/1.3)+posY);
 							gfx.fillText(vP,(SCL/2)+posX,(SCL/1.3)+posY, SCL);
 					}
 				}
@@ -395,10 +392,10 @@ grid.updateGridView = function(){
 	// Layer layout and title bars have been updated
 	grid.view.layersNeedUpdate = false;
 	grid.updateTimelineView();
-
 	grid.updateCharts(grid.view.currentTimeFrame, grid.view.viewBuffer);
 }
 
+//Detected layers
 grid.updateLayersView = function(){
 	var ports = grid.model.ports;	// shorthand
 
@@ -446,19 +443,6 @@ grid.updateLayoutColumns = function(){
 	grid.updateLayersView();
 }
 
-grid.toggleFixedPrecision = function(){
-	// Only the view settings changed, but the frame data
-	// remains the same. Just request a redraw.
-	grid.view.redrawRequested = true;
-	grid.updateGridView();
-}
-
-grid.updatePrecision = function(){
-	// Only the view settings changed, but the frame data
-	// remains the same. Just request a redraw.
-	grid.view.redrawRequested = true;
-	grid.updateGridView();
-}
 
 grid.toggleGridOverlay = function(){
 	// Only the view settings changed, but the frame data
@@ -503,6 +487,7 @@ grid.updateFPS = function(){
 	}
 }
 
+//Canvas values toggle
 grid.toggleValueDisplay = function(){
 	this.view.valueDisplay = !this.view.valueDisplay;
 	grab('showZero').disabled = !this.view.valueDisplay;
@@ -514,6 +499,20 @@ grid.toggleValueDisplay = function(){
 
 grid.toggleZeroDisplay = function(){
 	this.view.zeroDisplay = !this.view.zeroDisplay;
+	grid.view.redrawRequested = true;
+	grid.updateGridView();
+}
+
+grid.toggleFixedPrecision = function(){
+	// Only the view settings changed, but the frame data
+	// remains the same. Just request a redraw.
+	grid.view.redrawRequested = true;
+	grid.updateGridView();
+}
+
+grid.updatePrecision = function(){
+	// Only the view settings changed, but the frame data
+	// remains the same. Just request a redraw.
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -553,12 +552,12 @@ grid.initialView = function(){
 	document.documentElement.setAttribute('data-UA', navigator.userAgent);
 }
 
+//Toggle for any html element
 grid.toggleUI = function(isEnabled, list){
 	if (list == null) {
 			var list = ['precision','BtnRecord','BtnPlay', 'timelineSeek',
-						  'fixedPrecision', 'precision','loop', 'BtnRewind',
-						  'BtnPlayBw','BtnStepBw', 'BtnStepFw','BtnLastFrame',
-						  'showValues', 'showGridOverlay', 'layoutColumns', 'showZero'];
+						  'loop', 'BtnRewind','BtnPlayBw','BtnStepBw', 'showValues',
+						  'BtnStepFw','BtnLastFrame','showGridOverlay', 'layoutColumns'];
 	}
 	else {
 		var list = list;
@@ -629,7 +628,10 @@ function getMousePos(canvas, event) {
 var canvas = grid.view.canvy;
 canvas.addEventListener('mousemove', function(event) {
 	if (tipStatus) {
-		var ToolTip = grab('tip'); ToolTip.innerHTML=''; ToolTip.style.visibility = "visible";
+		var ToolTip = grab('tip'); 
+		ToolTip.innerHTML=''; 
+		ToolTip.style.visibility = "visible";
+		
         var mousePos = getMousePos(canvas, event);
 
 		var portID = 0;
@@ -666,16 +668,16 @@ canvas.addEventListener('mousemove', function(event) {
 canvas.addEventListener('mouseout', function(event) {
 	var ToolTip = grab('tip');
 	ToolTip.style.visibility = "hidden";
-	}, false);
+}, false);
 
 function toggleTip() {
 	var tipButton = grab("tipButton");
-	if (tipButton .style.backgroundColor=='red') {
-		tipButton .style.backgroundColor='green';
+	if (tipButton.style.backgroundColor=='red') {
+		tipButton.style.backgroundColor='green';
 		tipStatus=true;
 	}
 	else {
-		tipButton .style.backgroundColor='red';
+		tipButton.style.backgroundColor='red';
 		tipStatus=false;
 	}
 };
@@ -698,8 +700,7 @@ function showZoom(event) {
 	}
 }
 
-canvyDiv = grid.view.canvyDiv
-canvyDiv.addEventListener("mouseout", function(){
+grid.view.canvyDiv.addEventListener("mouseout", function(){
     zoom.style.display = "none";
 });
 
