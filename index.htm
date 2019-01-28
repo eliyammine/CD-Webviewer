@@ -18,7 +18,7 @@
 </head>
 
 <body>
-   <div id="stickyDiv">
+   <div id="stickyDivv">
       <div id="header">
          <div id="title">
             <h3>
@@ -26,7 +26,7 @@
 			</h3>
 
             <h2>
-				<a href="http://cell-devs.sce.carleton.ca/intranet/webviewer/" target="_blank">CellDEVS Simulation Viewer</a>
+				<a style='color:red;' href="http://cell-devs.sce.carleton.ca/intranet/webviewer/" target="_blank">CellDEVS Simulation Viewer</a>
 			</h2>
 
             <span id='alphaTag'><b> alpha</b></span>
@@ -37,12 +37,16 @@
 				<a href="mailto:omar.hesham@carleton.ca?Subject=[CellDEVSViewer][alpha]" target="_blank">&#9749; report a problem </a>
 			</span>
          </div>
+      </div>
 
-         <div id="inputzone">
+     <br>
+
+     <div id='basic-view'>
+               <div id="inputzone">
             <div id="dropzone">
                <div style="text-align: left; margin-left:10px;color:#aaa"><br><b>Input files</b> - Drag and drop or click to browse:<br></div>
 
-			   <div class="dz" id="maFile">
+            <div class="dz" id="maFile">
                   <br>Model <br>(.ma)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="ma-file" multiple />
                   <div class='statBox'></div>
@@ -69,47 +73,146 @@
                <br><br>
                &emsp;
                <button onclick="grid.loadSimulation()" id="BtnParseY">Load Simulation</button>
+               <button style='background-color:green;' onclick="grid.loadTestSimulation()" id="BtnParseY">Load Test Files (in progress)</button>
                <br><br>
+            </div>
+
+                  <div id="LayersDiv" style='display:none;'>
+                     &nbsp;&#8801; Detected layers:
+                  <div id="LayersList" hidden></div>
+               </div>  
+         </div>
+
+
+   <h4>Advanced View </h4>
+     <label class="switch">
+      Basic View
+       <input id='basic-view-button' type='checkbox' name='view'/>
+       <span class='slider'></span>
+     </label> <br><br>
+
+     <style>
+      /* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 160px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(126px);
+  -ms-transform: translateX(126px);
+  transform: translateX(126px);
+}
+
+     </style>
+     </div>
+
+     <div id='advanced-view' hidden>
+      <div id="controls" style='border-style:dashed;background-color:#050e17'>
+
+   <div class='rowDiv'>
+     <div class ='rowDiv' style='display: inline-table; text-align:left;padding:15px;'>
+      <ul>
+      <h4>Chart Selection</h4>
+         <li>
+            <label><input type="checkbox" id="showStateFreq" checked>States Frequency</label>
+         </li>
+         <li>
+            <label><input type="checkbox" id="showTransitions" checked>Transitions</label>
+         </li>
+         <li>
+            <label><input type="checkbox" id="showStats" checked>Statistics</label>
+         </li>
+      </ul>
+       </div>
+         &nbsp;
+         <div class='rowDiv' style='display: inline-table; text-align:left;padding:15px;'>
+            <ul>
+            <h4>Canvas Options</h4>
+
+            <li>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
+          &nbsp;</li>
+          <li><label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues">Show values</label></li>
+            <li><label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" >Fixed</label> </li>
+            <li><label><input onclick="grid.toggleZeroDisplay()" type="checkbox" id="showZero" >Zeroes</label> </li>
+            <li><label><input onclick="grid.toggleGridOverlay()" type="checkbox" id="showGridOverlay">Grid overlay</label> <input type="color" id="gridOverlayColor" value="#787882" oninput='grid.updateGridOverlayColor()'></li>
+         </ul>
+            <div style="display:none;">
+            Layout columns: <input type="number" value="1" id="layoutColumns" step='1' min="1" oninput="grid.updateLayoutColumns()" />
             </div>
          </div>
 
-         <div id="LayersDiv">
-            &nbsp;&#8801; Detected layers:
-            <div id="LayersList"></div>
-         </div>
+         <div class='rowDiv' style='display:inline-table; text-align:left; padding:15px;'>
+         <div id="chartControls">
+         <div class='rowDiv'>Track States:  <input type="text" value="" id="chart_states" /></div>
+         <button onclick="grid.showPalette()" id="BtnEditPalette" style="display: none">Edit Palette</button>
+     </div>
+  </div>
+
+
+      </div>
       </div>
 
-      <div id="controls">
-	<div class ='rowDiv'>Chart Selection:
-	  		<label><input type="checkbox" id="showStateFreq" checked>States Frequency</label> <span class="vsep"></span>
-			<label><input type="checkbox" id="showTransitions" checked>Transitions</label> <span class="vsep"></span>
-			<label><input type="checkbox" id="showStats" checked>Statistics</label>
-		 </div>
+     </div>
+   </div>
 
-         <div class='rowDiv'>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
-		    &nbsp;<label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues" disabled>Show values</label><span class="vsep"></span>
-            <label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" disabled>Fixed</label> <span class="vsep"></span>
-            <label><input onclick="grid.toggleZeroDisplay()" type="checkbox" id="showZero" disabled>Zeroes</label> <span class="vsep"></span>
-            <label><input onclick="grid.toggleGridOverlay()" type="checkbox" id="showGridOverlay">Grid overlay</label> <input type="color" id="gridOverlayColor" value="#787882" oninput='grid.updateGridOverlayColor()'>
-            <div style="display:none;"><span class="vsep"></span>
-            Layout columns: <input type="number" value="1" id="layoutColumns" step='1' min="1" oninput="grid.updateLayoutColumns()" /></div>
-         </div>
-
-         <div class='rowDiv'>
+      <div id='player' style='padding:25px;'>
+       <div id='play-controls' class='rowDiv' style='border-style:dashed;background-color:#050e17' hidden>
+         <h4> Player Controls </h4>
             <span id="timelineControls">
-            <button id="BtnRewind"		onclick="grid.rewindPlayback();"><B>I</B>&#x25C0;</button>
-            <button id="BtnPlayBw"		onclick="grid.playFramesBackwards()">&#x25C1;&#x25C1;</button>
-            <button id="BtnStepBw"		onclick="grid.pausePlayback();grid.prevFrame()">&#x25C1;<B>I</B></button>
-            <button id="BtnPlay"		onclick="grid.playFrames()">&#x25B6;</button>
-            <button id="BtnStepFw"		onclick="grid.pausePlayback();grid.nextFrame()"><B>I</B>&#x25B6;</button>
-            <button id="BtnLastFrame"	onclick="grid.lastFrame()">&#x25B6;<B>I</B></button>
+            <button id="BtnRewind"     onclick="grid.rewindPlayback();"><B>I</B></button>
+            <button id="BtnPlayBw"     onclick="grid.playFramesBackwards()">&#x25C1;&#x25C1;</button>
+            <button id="BtnStepBw"     onclick="grid.pausePlayback();grid.prevFrame()">&#x25C1;<B>I</B></button>
+            <button id="BtnPlay"    onclick="grid.playFrames()">&#x25B6;</button>
+            <button id="BtnStepFw"     onclick="grid.pausePlayback();grid.nextFrame()"><B>I</B>&#x25B6;</button>
+            <button id="BtnLastFrame"  onclick="grid.lastFrame()">&#x25B6;<B>I</B></button>
             <input type="range" id="timelineSeek" oninput='grid.seekTimeline()' onchange="grid.seekTimeline()" min="0" max="1" >
             </span>
             <label><input onclick="grid.toggleLoop()" type="checkbox" id="loop">Loop</label> <span class="vsep"></span>
             <div id="timelineStatus">Frame: 0 &emsp; Time: --:--:--:---</div>
-         </div>
 
-         <div class='rowDiv'>
             Pixels/cell (zoom):<input type="number" value="25" id="cellScale" step="1" min="1" max="500" oninput="grid.reCSSGrid(this)" />
             <span class="vsep"></span>
             Framerate (fps): <input type="number" value="15" id="framerate" min="1" max="500" oninput="grid.updateFPS()" /><span class="vsep"></span>
@@ -118,14 +221,11 @@
             <span id="videoLink" style="display:none">&nbsp;&nbsp;Video ready: <a id="videoViewLink" style="display:none;color:#AB7D6C;">watch &#x1f3a5;</a> |
             <a id="videoDownloadLink" style="display:none;color:#AB7D6C;">download &#8681;</a>
             </span>
+            <br><br>
          </div>
       </div>
 
-	  <div id="chartControls">
-         <div class='rowDiv'>Track States:  <input type="text" value="" id="chart_states" /></div>
-         <button onclick="grid.showPalette()" id="BtnEditPalette" style="display: none">Edit Palette</button>
-	  </div>
-   </div>
+   <!-- END OF STICKY DIV - END OF MAIN CONTENT -->
 
    <div id="chartsDiv" class="charts-container"></div>
    <div id="canvyDiv" style="display: none">
@@ -145,6 +245,17 @@
    <script src="src/model.js"></script>
    <script src="src/charting.js"></script>
    <script src="src/recording.js"></script>
+
+     <script>
+      document.getElementById('basic-view-button').addEventListener('click', function(){
+         if (this.checked) {
+            document.getElementById('advanced-view').style.display ='block';
+         } else {
+            document.getElementById('advanced-view').style.display ='none';
+         }
+      });
+
+     </script>
 
    <footer>
       <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> |
