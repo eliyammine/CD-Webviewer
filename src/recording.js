@@ -17,7 +17,7 @@ grid.view.videoOutput;
 grid.view.playbackHandle = 0;
 grid.view.playbackDirection = 0; // 0: paused, 1: forwards, 2: backwards
 grid.view.FPS = 1000/ grab('framerate').value;
-
+grid.view.gfx;
 
 grid.nextFrame = function(){
 	if(grid.view.currentTimeFrame<grid.model.frameCount-1){

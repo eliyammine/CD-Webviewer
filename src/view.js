@@ -90,6 +90,8 @@ grid.loadSimulation = function(){
 	//palette edition init
 	grab("BtnEditPalette").style.display = "inline-block";
 	grab("BtnEditPalette").disabled = false;
+	document.getElementById("play-controls").style.display = 'block';
+	document.getElementById("play-controls-details").style.display = 'block';
 	d3.selectAll("#paletteDiv").remove();
 }
 
