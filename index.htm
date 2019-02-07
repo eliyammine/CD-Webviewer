@@ -91,62 +91,7 @@
        <span class='slider'></span>
      </label> <br><br>
 
-     <style>
-      /* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 160px;
-  height: 34px;
-}
 
-/* Hide default HTML checkbox */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-input:checked + .slider {
-  background-color: #2196F3;
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(126px);
-  -ms-transform: translateX(126px);
-  transform: translateX(126px);
-}
-
-     </style>
      </div>
 
      <div id='advanced-view' hidden>
@@ -174,9 +119,6 @@ input:checked + .slider:before {
 
             <li>Max decimals: <input type="number" value="1" id="precision" step='1' min="0" max="20" oninput="grid.updatePrecision()" />
           &nbsp;</li>
-          <li><label><input onclick="grid.toggleValueDisplay()" type="checkbox" id="showValues">Show values</label></li>
-            <li><label><input onclick="grid.toggleFixedPrecision()" type="checkbox" id="fixedPrecision" >Fixed</label> </li>
-            <li><label><input onclick="grid.toggleZeroDisplay()" type="checkbox" id="showZero" >Zeroes</label> </li>
             <li><label><input onclick="grid.toggleGridOverlay()" type="checkbox" id="showGridOverlay">Grid overlay</label> <input type="color" id="gridOverlayColor" value="#787882" oninput='grid.updateGridOverlayColor()'></li>
          </ul>
             <div style="display:none;">
@@ -202,7 +144,7 @@ input:checked + .slider:before {
        <div id='play-controls' class='rowDiv' style='border-style:dashed;background-color:#050e17' hidden>
          <h4> Player Controls </h4>
             <span id="timelineControls">
-            <button id="BtnRewind"     onclick="grid.rewindPlayback();"><B>I</B></button>
+            <button id="BtnRewind"     onclick="grid.rewindPlayback();">&#x25C0;<B>I</B></button>
             <button id="BtnPlayBw"     onclick="grid.playFramesBackwards()">&#x25C1;&#x25C1;</button>
             <button id="BtnStepBw"     onclick="grid.pausePlayback();grid.prevFrame()">&#x25C1;<B>I</B></button>
             <button id="BtnPlay"    onclick="grid.playFrames()">&#x25B6;</button>
@@ -232,6 +174,9 @@ input:checked + .slider:before {
    <div class="canvas-btn-container">
    	  <button type='button' title="Zoom on cells" class="button" id=zoomButton style="background-color:red"; onclick="toggleZoom()";>&#x1F50D;</button>
 	  <button type='button' title="Information Tooltip" class="button" id=tipButton  style="background-color:red"; onclick="toggleTip()";>&#x1f6c8;</button>
+	  <button type='button' title="Show Values" class="button" id=showValuesButton  style="background-color:red"; onclick="grid.toggleValueDisplay()";>&#x23;</button>
+	  <button type='button' title="Fixed-Precision Values" class="button" id=showFixedPrecision  style="background-color:red" onclick="grid.toggleFixedPrecision()"; disabled>.xx</button>
+	  <button type='button' title="Show Zeros" class="button" id=showZeros  style="background-color:red"; onclick="grid.toggleZeroDisplay()"; disabled>&#x30;</button>
 	</div>
       <canvas id="canvy" style= "display: none"></canvas>
 	  <canvas id="zoom" width= "400" height="400" style="position:absolute; top:0; left:0; display:none"></canvas>
@@ -245,17 +190,6 @@ input:checked + .slider:before {
    <script src="src/model.js"></script>
    <script src="src/charting.js"></script>
    <script src="src/recording.js"></script>
-
-     <script>
-      document.getElementById('basic-view-button').addEventListener('click', function(){
-         if (this.checked) {
-            document.getElementById('advanced-view').style.display ='block';
-         } else {
-            document.getElementById('advanced-view').style.display ='none';
-         }
-      });
-
-     </script>
 
    <footer>
       <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> |

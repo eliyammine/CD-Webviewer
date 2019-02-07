@@ -226,6 +226,7 @@ grid.toggleLoop = function(){
 }
 
 // Sticky the timeline controls
+/*
 grid.stickyControls = function(){
 	var	headerTop = grab('header').clientHeight,
 		headerLeft= grab('header').clientWidth,
@@ -234,7 +235,7 @@ grid.stickyControls = function(){
 		controls  = grab('stickyDiv');
 	/* (window.pageYOffset !== undefined) ?
 	 window.pageYOffset : (document.documentElement 
-	 || document.body.parentNode || document.body).scrollTop;*/
+	 || document.body.parentNode || document.body).scrollTop;
 	if(scrollTop-headerTop > 0){
 		controls.style.top = (scrollTop-headerTop)+'px';
 		controls.style.boxShadow = '0px 3px 5px #222';
@@ -246,3 +247,4 @@ grid.stickyControls = function(){
 	controls.style.left = scrollLeft +'px';
 }
 window.onscroll = grid.stickyControls; 
+*/

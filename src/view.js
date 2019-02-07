@@ -43,7 +43,6 @@ grid.view.currentTimeFrame = 1;
  
 //canvas
 grid.view.div = grab('grid');
-grid.view.valueDisplay = grab('showValues').checked;
 grid.view.canvy = grab('canvy');
 grid.view.canvyDiv = grab('canvyDiv');
 
@@ -62,6 +61,10 @@ origin_x=0;
 origin_y=0;
 zoomStatus = false;
 tipStatus = false;
+showValuesStatus = false;
+showZerosStatus = false;
+showFixedPrecision =false;
+
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -132,7 +135,10 @@ grid.setupGrid = function(){
 
 	// Renable timeline controls
 	grid.toggleUI(true);
-	if(grab('showValues').checked) 		grid.toggleUI(true, ['showZero', 'fixedPrecision']);
+	if(showValuesStatus == true) {
+		grab('showZeros').disabled = false;
+		grab('showFixedPrecision').disabled = false;
+	}
 	if(grab('showGridOverlay').checked) grid.toggleUI(true, ['gridOverlayColor']);
 
 	// Disable random access and backwards playback if cache is disabled
@@ -179,14 +185,14 @@ grid.updateGridView = function(){
 	var data 			= grid.model.data,		// shorthand
 		ports 			= grid.model.ports,
 		precision 		= grab('precision').value,
-		fixedPrecision 	= grab('fixedPrecision').checked,
+		fixedPrecision 	= showFixedPrecision,
 		canvy 			= grid.view.canvy,
 		barH 			= grid.view.barHeight,
 		barW 			= grid.view.barWidth,
 		cols 			= grid.view.layoutColumns,
 		gfx 			= grid.view.gfx,
-		vDisplay		= grab('showValues').checked,
-		zeroDisplay 	= grid.view.zeroDisplay,
+		vDisplay		= showValuesStatus,
+		zeroDisplay 	= showZerosStatus,
 		fb 				= grid.view.viewBuffer,
 		dc 				= grid.view.dataCache
 
@@ -491,16 +497,36 @@ grid.updateFPS = function(){
 
 //Canvas values toggle
 grid.toggleValueDisplay = function(){
-	this.view.valueDisplay = !this.view.valueDisplay;
-	grab('showZero').disabled = !this.view.valueDisplay;
-	grab('fixedPrecision').disabled = !this.view.valueDisplay;
-
+	var showValues = grab('showValuesButton');
+	
+	if(showValues.style.backgroundColor=='red') {
+		showValues.style.backgroundColor='green';
+		showValuesStatus = true;
+		grab('showZeros').disabled = !showValuesStatus;
+		grab('showFixedPrecision').disabled = !showValuesStatus;
+	}
+	else {
+		showValues.style.backgroundColor='red';
+		showValuesStatus = false;
+		grab('showZeros').disabled = !showValuesStatus;
+		grab('showFixedPrecision').disabled = !showValuesStatus;
+	}
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
 
 grid.toggleZeroDisplay = function(){
-	this.view.zeroDisplay = !this.view.zeroDisplay;
+	var showZeros = grab('showZeros');
+	
+	if(showZeros.style.backgroundColor=='red') {
+		showZeros.style.backgroundColor='green';
+		showZerosStatus = true;
+	}
+	else {
+		showZeros.style.backgroundColor='red';
+		showZerosStatus = false;
+	}
+	
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -508,6 +534,18 @@ grid.toggleZeroDisplay = function(){
 grid.toggleFixedPrecision = function(){
 	// Only the view settings changed, but the frame data
 	// remains the same. Just request a redraw.
+	
+	var fixedPrecision = grab('showFixedPrecision');
+	
+	if (fixedPrecision.style.backgroundColor=='red') {
+		fixedPrecision.style.backgroundColor='green';
+		showFixedPrecision = true;
+	}
+	else {
+		fixedPrecision.style.backgroundColor='red';
+		showFixedPrecision = false;
+	}
+	
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -558,7 +596,7 @@ grid.initialView = function(){
 grid.toggleUI = function(isEnabled, list){
 	if (list == null) {
 			var list = ['precision','BtnRecord','BtnPlay', 'timelineSeek',
-						  'loop', 'BtnRewind','BtnPlayBw','BtnStepBw', 'showValues',
+						  'loop', 'BtnRewind','BtnPlayBw','BtnStepBw',
 						  'BtnStepFw','BtnLastFrame','showGridOverlay', 'layoutColumns'];
 	}
 	else {
@@ -768,3 +806,12 @@ grid.statesList = function() {
 	track=track.substring(0,track.length-1);
 	states.value = track;
 }
+
+document.getElementById('basic-view-button').addEventListener('click', function(){
+    if (this.checked) {
+        document.getElementById('advanced-view').style.display ='block';
+    } 
+	else {
+        document.getElementById('advanced-view').style.display ='none';
+       }
+    });
