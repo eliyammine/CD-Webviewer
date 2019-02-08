@@ -805,7 +805,8 @@ function cell(x,y,z) {
 function drawOutline() {
 	ctx = canvas.getContext("2d");
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
-		ctx.lineWidth = 2;
+		ctx.lineWidth = 5;
+		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
 		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL); 
 	}
 }
