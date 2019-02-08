@@ -65,6 +65,8 @@ showValuesStatus = false;
 showZerosStatus = false;
 showFixedPrecision =false;
 
+grid.SelectedCells = [];
+fbSel = []
 
 function previousCacheTime(t){	// find most previous cache point to time t
 	var	isLastFrame = (t==(grid.model.frameCount-1));
@@ -94,7 +96,6 @@ grid.loadSimulation = function(){
 	grab("BtnEditPalette").style.display = "inline-block";
 	grab("BtnEditPalette").disabled = false;
 	document.getElementById("play-controls").style.display = 'block';
-	document.getElementById("play-controls-details").style.display = 'block';
 	d3.selectAll("#paletteDiv").remove();
 }
 
@@ -129,7 +130,8 @@ grid.setupGrid = function(){
 
 	canvy.width = (gridData.dimX*SCL+grid.view.barWidth) * grid.view.layoutColumns - grid.view.barWidth;
 	canvy.height= (gridData.dimY*SCL+grid.view.barHeight)* Math.ceil(nGrid/grid.view.layoutColumns);
-
+	
+	
 	// Signal that layers need to be redrawn
 	grid.view.layersNeedUpdate = true;
 
@@ -401,6 +403,7 @@ grid.updateGridView = function(){
 	grid.view.layersNeedUpdate = false;
 	grid.updateTimelineView();
 	grid.updateCharts(grid.view.currentTimeFrame, grid.view.viewBuffer);
+	drawOutline();
 }
 
 //Detected layers
@@ -650,8 +653,18 @@ grid.toggleCharts = function(z, port) {
 }
 
 grid.updateCharts = function(t, fb) {
-	Viz.data.UpdateTime(t, fb);
-
+	fbSel = [[[]]]
+	if (grid.SelectedCells.length == 0) {
+		Viz.data.UpdateTime(t, fb);
+	}
+	else {
+		var array = grid.SelectedCells;
+		for (var i in array) {
+			fbSel[0][0][i]=fb[array[i].z][array[i].y][array[i].x];
+		}
+		Viz.data.UpdateTime(t, fb, fbSel);
+	}
+	
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
@@ -667,16 +680,32 @@ function getMousePos(canvas, event) {
 
 var canvas = grid.view.canvy;
 canvas.addEventListener('mousemove', function(event) {
+	var fb = grid.view.viewBuffer;
 	if (tipStatus) {
 		var ToolTip = grab('tip'); 
 		ToolTip.innerHTML=''; 
 		ToolTip.style.visibility = "visible";
 		
-        var mousePos = getMousePos(canvas, event);
+	    var mousePos = getMousePos(canvas, event);
+		var value = getCellValue(mousePos);
+		var cellX = value.cellX,
+			cellY = value.cellY,
+			layer = value.layer,
+			portID = value.portID
+		
+		
+		var message = 'Pos(X, Y, Z): (' + cellX +',' + cellY +','+layer+')<br>';
+		message += 'State: ' + fb[layer][cellY][cellX][portID]+'<br>';
+		message += 'Transitions:' + Viz.data.transitions[cellX][cellY];
+		ToolTip.innerHTML += message;
+		ToolTip.style.left=(event.pageX)-85 + 'px';
+		ToolTip.style.top=(event.pageY)+23 + 'px';
+	}
+}, false);
 
+function getCellValue (mousePos) {
 		var portID = 0;
 		var layer =0;
-		var fb = grid.view.viewBuffer;
 
 		var height = Math.round((canvy.height/scale)/(grid.model.dimY*grid.model.dimZ));
 		var width = Math.round((canvy.width/scale)/(grid.model.dimX));
@@ -695,15 +724,14 @@ canvas.addEventListener('mousemove', function(event) {
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
 		if (cellX == -1) cellX =0;
 		if (cellY == -1) cellY =0;
-
-		var message = 'Pos(X, Y, Z): (' + cellX +',' + cellY +','+layer+')<br>';
-		message += 'State: ' + fb[layer][cellY][cellX][portID]+'<br>';
-		message += 'Transitions:' + Viz.data.transitions[cellX][cellY];
-		ToolTip.innerHTML += message;
-		ToolTip.style.left=(event.pageX)-85 + 'px';
-		ToolTip.style.top=(event.pageY)+23 + 'px';
-	}
-}, false);
+		
+		return {
+			cellX: cellX, 
+			cellY: cellY, 
+			layer: layer,
+			portID: portID
+		};
+}
 
 canvas.addEventListener('mouseout', function(event) {
 	var ToolTip = grab('tip');
@@ -740,10 +768,51 @@ function showZoom(event) {
 	}
 }
 
+canvas.addEventListener('click',selectCell,false);
+function selectCell(event) {
+	var mousePos = getMousePos(canvas,event);
+	var value = getCellValue(mousePos);
+	var cellX = value.cellX,
+		cellY = value.cellY,
+		layer = value.layer
+	
+	if (grid.SelectedCells.length == 0) {
+		grid.SelectedCells.push(new cell(cellX, cellY, layer));
+		drawOutline();
+	}
+	else {
+		var found = false;
+		for (var i=grid.SelectedCells.length-1; i>=0; i--) {
+			if ((grid.SelectedCells[i].x == cellX) && (grid.SelectedCells[i].y == cellY) && (grid.SelectedCells[i].z == layer)) {
+				found = true;
+				grid.SelectedCells.splice(i,1);
+				grid.updateGridView();
+			}
+		}
+		if (!found) {
+			grid.SelectedCells.push(new cell(cellX, cellY, layer));
+			drawOutline();
+		}
+	}
+}
+
+function cell(x,y,z) {
+	this.x = x;
+	this.y = y;
+	this.z = z;
+}
+
+function drawOutline() {
+	ctx = canvas.getContext("2d");
+	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
+		ctx.lineWidth = 2;
+		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL); 
+	}
+}
+
 grid.view.canvyDiv.addEventListener("mouseout", function(){
     zoom.style.display = "none";
 });
-
 function toggleZoom() {
 	var zoomButton = grab("zoomButton");
 	if (zoomButton.style.backgroundColor=='red') {

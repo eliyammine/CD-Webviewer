@@ -58,7 +58,7 @@ Viz.data = {
 	UpdateStates : function(fb) {
 		this.states = {};
 		var layer = fb[this.z];
-		
+
 		for (var i = 0; i < this.track.length; i++) {
 			var clss = this.track[i];
 			
@@ -67,7 +67,6 @@ Viz.data = {
 			for (var j=0; j < layer.length; j++){			
 				for (var k=0; k < layer[j].length; k++){ 
 					var state = layer[j][k][0];
-					
 					if (clss == state) this.states[clss]++;
 					
 					else if (Array.isArray(clss) && state > clss[0] && state < clss[1]) this.states[clss]++;					
@@ -121,11 +120,14 @@ Viz.data = {
 		return Viz.Utils.map(this.track, function(value) { return this.states[value]; }.bind(this));
 	},
 	
-	UpdateTime : function(t, fb) {
+	UpdateTime : function(t, fb, fbSel) {
 		if (t == 0) this.transitions = this.ResetTransitions();
 		
 		else this.ApplyTransitions(t);
 		
+		if (grid.SelectedCells.length != 0) {
+			fb = fbSel;
+		}
 		if (fb) this.UpdateStates(fb);
 		
 		this.t = t;		
