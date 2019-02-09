@@ -776,7 +776,7 @@ function selectCell(event) {
 		layer = value.layer
 	var ctx = canvas.getContext("2d");
 	ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
-	
+	ctx.lineWidth = 5;
 	if (grid.SelectedCells.length == 0) {
 		grid.SelectedCells.push(new cell(cellX, cellY, layer));
 		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL); 
