@@ -67,6 +67,9 @@ Viz.data = {
 			for (var j=0; j < layer.length; j++){			
 				for (var k=0; k < layer[j].length; k++){ 
 					var state = layer[j][k][0];
+					if (Number.isInteger(clss)) {
+						state = Math.floor(state);
+					}
 					if (clss == state) this.states[clss]++;
 					
 					else if (Array.isArray(clss) && state > clss[0] && state < clss[1]) this.states[clss]++;					
@@ -281,6 +284,15 @@ Viz.charting = {
 		
 		this.AddTooltip(chart);
 		
+		var subtitle = 0;
+		var f = chart.g.append("text")
+					   .attr("class","subtitle")
+				       .text("Tracking: " +subtitle+ " cells")
+					   
+			
+			f.attr("x", chart.size.w / 2 - bbox.width / 2)
+			 .attr("y", -5)
+		
 		// Refresh data bars, remove old, regenerate
 		chart.g.selectAll(".bar")
 			 .data(Viz.data.track)
@@ -295,6 +307,24 @@ Viz.charting = {
 			   .on("mouseover", onBarMouseOver)
 			   .on("mouseout", onBarMouseOut);
 
+		chart.g.selectAll(".subtitle").on("click",function(d) {
+			var overlay = document.getElementById('StatsOverlay');
+
+			overlay.innerHTML = '';
+			if (grid.SelectedCells.length != 0) {
+				for (var i in grid.SelectedCells) {
+					overlay.innerHTML+=(JSON.stringify(grid.SelectedCells[i]))+ ", ";
+				}
+				
+				if (overlay.style.display == "block") {
+					overlay.style.display = "none";
+				}
+				else {
+					overlay.style.display = "block";
+				}
+			}
+		});
+		
 		chart.Update = function(states) {
 			if (this.bar) UpdateTooltip();
 			
@@ -303,6 +333,8 @@ Viz.charting = {
 				.data(states)
 				.attr("y", function(d) { return this.y(d); }.bind(this))
 				.attr("height", function(d) { return this.size.h - this.y(d); }.bind(this))
+			subtitle =  states.reduce(function(a,b) { return a+b },0);
+			d3.select(".subtitle").text("Tracking: " +subtitle+ " cells");
 		}
 		
 		function UpdateTooltip() {

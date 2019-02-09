@@ -73,6 +73,7 @@ grid.lastFrame = function(){
 
 grid.playFrames = function(){
 	// Don't set an interval if already playing forwards (1)
+	
 	if(grid.view.playbackDirection != 1){
 		grid.pausePlayback();
 		grid.view.playbackDirection = 1;

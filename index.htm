@@ -170,6 +170,7 @@
    <!-- END OF STICKY DIV - END OF MAIN CONTENT -->
 
    <div id="chartsDiv" class="charts-container"></div>
+   <div id="StatsOverlay" style= "display: none"></div>
    <div id="canvyDiv" style="display: none">
    <div class="canvas-btn-container">
    	  <button type='button' title="Zoom on cells" class="button" id=zoomButton style="background-color:red"; onclick="toggleZoom()";>&#x1F50D;</button>
@@ -177,6 +178,7 @@
 	  <button type='button' title="Show Values" class="button" id=showValuesButton  style="background-color:red"; onclick="grid.toggleValueDisplay()";>&#x23;</button>
 	  <button type='button' title="Fixed-Precision Values" class="button" id=showFixedPrecision  style="background-color:red" onclick="grid.toggleFixedPrecision()"; disabled>.xx</button>
 	  <button type='button' title="Show Zeros" class="button" id=showZeros  style="background-color:red"; onclick="grid.toggleZeroDisplay()"; disabled>&#x30;</button>
+	  <button type='button' title="Clear Selection" class="button" id=clearSelection  style="background-color:white"; onclick="clearSelectedCells()";>X</button>
 	</div>
       <canvas id="canvy" style= "display: none"></canvas>
 	  <canvas id="zoom" width= "400" height="400" style="position:absolute; top:0; left:0; display:none"></canvas>

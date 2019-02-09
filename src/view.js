@@ -56,7 +56,6 @@ grid.view.redrawRequested = true;
 SCL = grab('cellScale').value;
 
 //Zoom and tooltip
-scale = 1;
 origin_x=0;
 origin_y=0;
 zoomStatus = false;
@@ -216,7 +215,7 @@ grid.updateGridView = function(){
 		// Transparent pixels break Whammy encoder
 		// Use canvas div bg color instead
 		gfx.fillStyle = window.getComputedStyle(canvyDiv).getPropertyValue('background-color');
-		gfx.fillRect(origin_x,origin_y,canvy.width/scale,canvy.height/scale);
+		gfx.fillRect(origin_x,origin_y,canvy.width,canvy.height);
 	}
 
 	// Is this frame cached? (i.e. last or multiple of caching period)
@@ -707,8 +706,8 @@ function getCellValue (mousePos) {
 		var portID = 0;
 		var layer =0;
 
-		var height = Math.round((canvy.height/scale)/(grid.model.dimY*grid.model.dimZ));
-		var width = Math.round((canvy.width/scale)/(grid.model.dimX));
+		var height = Math.round((canvy.height)/(grid.model.dimY*grid.model.dimZ));
+		var width = Math.round((canvy.width)/(grid.model.dimX));
 
 		var cellX=Math.round((mousePos.x-20)/width);
 		var cellY=Math.round((mousePos.y-18)/height);
@@ -794,6 +793,7 @@ function selectCell(event) {
 			drawOutline();
 		}
 	}
+	grab('StatsOverlay').style.display = "none";
 }
 
 function cell(x,y,z) {
@@ -805,11 +805,21 @@ function cell(x,y,z) {
 function drawOutline() {
 	ctx = canvas.getContext("2d");
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
-		ctx.lineWidth = 5;
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
 		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL); 
 	}
 }
+
+function clearSelectedCells() {
+	grid.SelectedCells = [];
+	if (grid.view.playbackDirection != 1) {
+		grid.playFrames();
+	}
+	grab('StatsOverlay').style.display = "none";
+	grid.updateGridView();
+}
+
+
 
 grid.view.canvyDiv.addEventListener("mouseout", function(){
     zoom.style.display = "none";

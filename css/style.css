@@ -157,6 +157,13 @@ button:disabled {
 	margin: 0;
 	padding: 0 auto;
 }
+#player {
+	width: 1225px;
+	height: 100px;
+	position: relative;
+	margin: auto;
+}
+
 label{
 	cursor: pointer;
 }
@@ -237,6 +244,10 @@ label{
 	font-size: 25px;
 	margin-bottom: 20px; 
 }	
+
+#showZeros{
+	margin-bottom: 20px;
+}
 .charts-container {
 	
     height: auto;
@@ -306,6 +317,19 @@ label{
 .chart.stats .results {
 	padding: 8px;
     padding-left: 16px;
+}
+
+#StatsOverlay {
+	position: fixed;
+	width: 20%;
+	height: 20%;
+	top:0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0,0,0,0.5);
+	font-size: 15px;
+	overflow: scroll;
 }
 
 div.tooltip {
