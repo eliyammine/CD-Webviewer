@@ -774,10 +774,12 @@ function selectCell(event) {
 	var cellX = value.cellX,
 		cellY = value.cellY,
 		layer = value.layer
+	var ctx = canvas.getContext("2d");
+	ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
 	
 	if (grid.SelectedCells.length == 0) {
 		grid.SelectedCells.push(new cell(cellX, cellY, layer));
-		drawOutline();
+		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL); 
 	}
 	else {
 		var found = false;
@@ -790,7 +792,7 @@ function selectCell(event) {
 		}
 		if (!found) {
 			grid.SelectedCells.push(new cell(cellX, cellY, layer));
-			drawOutline();
+			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL); 
 		}
 	}
 	grab('StatsOverlay').style.display = "none";
