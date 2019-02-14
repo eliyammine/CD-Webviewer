@@ -40,7 +40,7 @@ grid.view.CACHE_ENABLED = true;
 grid.view.SHOW_CACHE_ONLY = false;
 grid.view.cacheCount = 0;
 grid.view.currentTimeFrame = 1;
- 
+
 //canvas
 grid.view.div = grab('grid');
 grid.view.canvy = grab('canvy');
@@ -129,8 +129,8 @@ grid.setupGrid = function(){
 
 	canvy.width = (gridData.dimX*SCL+grid.view.barWidth) * grid.view.layoutColumns - grid.view.barWidth;
 	canvy.height= (gridData.dimY*SCL+grid.view.barHeight)* Math.ceil(nGrid/grid.view.layoutColumns);
-	
-	
+
+
 	// Signal that layers need to be redrawn
 	grid.view.layersNeedUpdate = true;
 
@@ -500,7 +500,7 @@ grid.updateFPS = function(){
 //Canvas values toggle
 grid.toggleValueDisplay = function(){
 	var showValues = grab('showValuesButton');
-	
+
 	if(showValues.style.backgroundColor=='red') {
 		showValues.style.backgroundColor='green';
 		showValuesStatus = true;
@@ -519,7 +519,7 @@ grid.toggleValueDisplay = function(){
 
 grid.toggleZeroDisplay = function(){
 	var showZeros = grab('showZeros');
-	
+
 	if(showZeros.style.backgroundColor=='red') {
 		showZeros.style.backgroundColor='green';
 		showZerosStatus = true;
@@ -528,7 +528,7 @@ grid.toggleZeroDisplay = function(){
 		showZeros.style.backgroundColor='red';
 		showZerosStatus = false;
 	}
-	
+
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -536,9 +536,9 @@ grid.toggleZeroDisplay = function(){
 grid.toggleFixedPrecision = function(){
 	// Only the view settings changed, but the frame data
 	// remains the same. Just request a redraw.
-	
+
 	var fixedPrecision = grab('showFixedPrecision');
-	
+
 	if (fixedPrecision.style.backgroundColor=='red') {
 		fixedPrecision.style.backgroundColor='green';
 		showFixedPrecision = true;
@@ -547,7 +547,7 @@ grid.toggleFixedPrecision = function(){
 		fixedPrecision.style.backgroundColor='red';
 		showFixedPrecision = false;
 	}
-	
+
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 }
@@ -663,7 +663,7 @@ grid.updateCharts = function(t, fb) {
 		}
 		Viz.data.UpdateTime(t, fb, fbSel);
 	}
-	
+
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
@@ -681,20 +681,22 @@ var canvas = grid.view.canvy;
 canvas.addEventListener('mousemove', function(event) {
 	var fb = grid.view.viewBuffer;
 	if (tipStatus) {
-		var ToolTip = grab('tip'); 
-		ToolTip.innerHTML=''; 
+		var ToolTip = grab('tip');
+		ToolTip.innerHTML='';
 		ToolTip.style.visibility = "visible";
-		
+
 	    var mousePos = getMousePos(canvas, event);
 		var value = getCellValue(mousePos);
 		var cellX = value.cellX,
 			cellY = value.cellY,
 			layer = value.layer,
 			portID = value.portID
-		
-		
+    //Legend name changes
+    var state = fb[layer][cellY][cellX][portID];
+    var stateName = grid.getLegend(state);
 		var message = 'Pos(X, Y, Z): (' + cellX +',' + cellY +','+layer+')<br>';
-		message += 'State: ' + fb[layer][cellY][cellX][portID]+'<br>';
+		message += 'State: ' + state +'<br>';
+    message += stateName === "-" ? "" : "Name: " + stateName + "<br>";
 		message += 'Transitions:' + Viz.data.transitions[cellX][cellY];
 		ToolTip.innerHTML += message;
 		ToolTip.style.left=(event.pageX)-85 + 'px';
@@ -723,10 +725,10 @@ function getCellValue (mousePos) {
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
 		if (cellX == -1) cellX =0;
 		if (cellY == -1) cellY =0;
-		
+
 		return {
-			cellX: cellX, 
-			cellY: cellY, 
+			cellX: cellX,
+			cellY: cellY,
 			layer: layer,
 			portID: portID
 		};
@@ -779,7 +781,7 @@ function selectCell(event) {
 	ctx.lineWidth = 5;
 	if (grid.SelectedCells.length == 0) {
 		grid.SelectedCells.push(new cell(cellX, cellY, layer));
-		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL); 
+		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL);
 	}
 	else {
 		var found = false;
@@ -792,7 +794,7 @@ function selectCell(event) {
 		}
 		if (!found) {
 			grid.SelectedCells.push(new cell(cellX, cellY, layer));
-			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL); 
+			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL);
 		}
 	}
 	grab('StatsOverlay').style.display = "none";
@@ -808,7 +810,7 @@ function drawOutline() {
 	ctx = canvas.getContext("2d");
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
-		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL); 
+		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL);
 	}
 }
 
@@ -865,8 +867,15 @@ grid.showPalette = function() {
 				.append("input").attr("type","color")
 				.attr("value", color)
 				.attr("id","colorWell_"+i);
-		}
+        row.append("td").style("padding-left","10px")
+        .append("input").attr("type","text")
+        .style("width","80px")
+        .attr("maxlength","20")
+        .attr("value",grid.palette[i][2])
+        .attr("id","stateName_"+i);
+      }
 		table.selectAll("input[type=color]").on("change",grid.changePalette);
+    table.selectAll("input[type=text]").on("change",grid.changeLegend);
 }
 
 grid.changePalette = function(event) {
@@ -876,6 +885,22 @@ grid.changePalette = function(event) {
 				grid.palette[id][1][i] = parseInt (val.substring(1+i*2,3+2*i),16);
 				console.log("RGB "+i+": "+grid.palette[id][1][i]);
 		}
+}
+
+grid.changeLegend = function(event) {
+  let id = d3.event.target.id.split("_")[1];
+  d3.event.target.value += d3.event.target.value === ""? "-": "";
+  let val = d3.event.target.value;
+  grid.palette[id][2] = val;
+}
+
+grid.getLegend = function(value) {
+  for (var i = 0; i < grid.palette.length; i++) {
+    var mmax = grid.palette[i][0];
+    if (value < mmax[0] || value >= mmax[1]) continue;
+    return grid.palette[i][2];
+  }
+  return "-";
 }
 
 grid.statesList = function() {
@@ -892,7 +917,7 @@ grid.statesList = function() {
 document.getElementById('basic-view-button').addEventListener('click', function(){
     if (this.checked) {
         document.getElementById('advanced-view').style.display ='block';
-    } 
+    }
 	else {
         document.getElementById('advanced-view').style.display ='none';
        }

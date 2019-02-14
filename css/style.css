@@ -7,9 +7,9 @@
  * Project: 	Online Cell-DEVS Visualizer
  * File: 		style.css
  * Description: Stylesheet (cold dark grey) designed to
- * 				be easier on the user's eyes, especially 
+ * 				be easier on the user's eyes, especially
  * 				when working late hours at night; as many
- * 				developers and researchers do. 	/o.o\	
+ * 				developers and researchers do. 	/o.o\
  */
 
 /* Import web fonts */
@@ -20,8 +20,8 @@
 
 body{
 	background-color: #2a2a31;
-	color: #ccc; 
-	font-family: 'Varela Round', sans-serif; 
+	color: #ccc;
+	font-family: 'Varela Round', sans-serif;
 	font-size: 10pt;
 	text-align: center;
 	margin:0;
@@ -85,13 +85,13 @@ h2 a, h2 a:hover{
 }
 footer{
 	margin:30px auto;
-	opacity: 0.4; 
-	border-top:1px dotted gray; 
+	opacity: 0.4;
+	border-top:1px dotted gray;
 	padding-top:4px;
 }
 
-footer a, footer a:visited{ 
-	text-decoration:none; 
+footer a, footer a:visited{
+	text-decoration:none;
 	color:inherit;
 }
 
@@ -242,25 +242,25 @@ label{
 
 #tipButton{
 	font-size: 25px;
-	margin-bottom: 20px; 
-}	
+	margin-bottom: 20px;
+}
 
 #showZeros{
 	margin-bottom: 20px;
 }
 .charts-container {
-	
+
     height: auto;
 	width:400px;
 	padding:0px;
 }
 
-.chart-container.state { 
+.chart-container.state {
 	height : 280px;
 }
 
 
-.chart-container.activity { 
+.chart-container.activity {
 	height : auto;
 }
 
@@ -295,10 +295,10 @@ label{
     fill: #ccc;
 }
 
-.chart text.title { 
+.chart text.title {
 	font-size : 13px;
 	font-weight:bold;
-	
+
 }
 
 .chart.stats {
@@ -379,9 +379,9 @@ html[data-UA*='Trident'] #gridOverlayColor,
 html[data-UA*='Mac OS'] #gridOverlayColor
 {
 	/* Color Input is supported only in Chrome, FF, & Opera
-	   Hide it in IE (msie, edge, trident) and Safari 
+	   Hide it in IE (msie, edge, trident) and Safari
 	 */
-	display:none;	
+	display:none;
 }
 #precision{
 	background-color:rgb(80,80,75);
@@ -423,7 +423,7 @@ html[data-UA*='Mac OS'] #gridOverlayColor
 	text-shadow: 0px 1px 1px rgba(50, 50, 50, 1);
 	width: 4em;
 }
-#chart_states {
+#chart_states, input[type=text] {
 	background-color:rgb(80,80,75);
 	border-radius: 3px;
 	border: inset 2px rgba(40,40,30,0.8);
@@ -459,7 +459,7 @@ html[data-UA*='Mac OS'] #gridOverlayColor
 	z-index: 1;
 }
 #dropzone .dz input{
-	opacity:0; 
+	opacity:0;
 	overflow: hidden;
 	width: 110%;
 	height:110%;
@@ -669,4 +669,3 @@ input:checked + .slider:before {
   -ms-transform: translateX(126px);
   transform: translateX(126px);
 }
-

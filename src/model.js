@@ -8,12 +8,12 @@
  * File: 		model.js
  * Description: The Model component of the Grid object
  * 				initializes using input data (data.js),
- * 				stores, and periodically updates the 
- * 				grid with new incoming time frames. 
+ * 				stores, and periodically updates the
+ * 				grid with new incoming time frames.
  */
 
 // [TODO] Modularize the entire "grid" object for easy namespace and member privacy
-// 
+//
 
 /** Not used now; maybe for archiving or speeding up a tight loop */
 grid.model.leanData=[	// Entire Data Stream
@@ -30,7 +30,7 @@ grid.model.data = [];
 grid.parseInputAttribute = function(attributeName, input){
 	// [TODO] Might need proper Object-oriented parsing instead of a naive string search
 	var regexp = new RegExp(attributeName, 'i'); // i: case insensitive
-	
+
 	// Check if the attribute exists in the input file
 	if(regexp.test(input)){
 		// Find the indices of the attribute value ("...attributeName: <start>value<end>\n...")
@@ -74,9 +74,9 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 	var eof = false; // end of file
 	var frameIndex = 0;
 	var data 		 = grid.model.data;				//shorthands
-	var cache 		 = grid.view.dataCache; 
+	var cache 		 = grid.view.dataCache;
 	var cachePeriod  = grid.view.CACHE_PERIOD;
-	var cacheEnabled = grid.view.CACHE_ENABLED;	
+	var cacheEnabled = grid.view.CACHE_ENABLED;
 
 
 	for (var msgCount=0;!eof;msgCount++){
@@ -84,16 +84,16 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 		caret = inLog.indexOf(keyString+'Y', caret);
 		if(caret == lastYindex)	eof = true;	// we've reached the last message
 
-		// Take a single Y-msg 
+		// Take a single Y-msg
 		var msg = inLog.substring(caret, inLog.indexOf('\n', caret));
 		var msgSplit = msg.split('/');	// msg contents delimited by '/'
 
 		// Which component to update (ignore '-')? (for now, only process component[0])
 		if(msg.split('-').join('').indexOf(grid.model.components[0]+'(')==-1){
-			caret += msg.length; 
+			caret += msg.length;
 			continue;
 		}
-		
+
 		// Process Y-messages here or during grid update? [TODO] postpone it till update to detect layers
 		var yStart = 0; var yEnd = 0;// character indices within a Y message
 		/**
@@ -104,8 +104,8 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 			// Find "hour"
 			yStart 	= msg.search(/\d/);							// find first digit
 			yEnd 	= msg.indexOf(':', yStart);					// find end of number
-			t[0] 	= parseInt(msg.substr(yStart, yEnd), 10);	// parse to decimal int 
-			//Find "minute" 
+			t[0] 	= parseInt(msg.substr(yStart, yEnd), 10);	// parse to decimal int
+			//Find "minute"
 			yStart  = msg.substr(yEnd).search(/\d/) + yEnd;
 			yEnd 	= msg.indexOf(':', yStart);
 			t[1]	= parseInt(msg.substr(yStart, yEnd), 10);
@@ -123,9 +123,9 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 			yEnd 	= msg.indexOf(')', yStart);
 			pSplit	= msg.substring(yStart, yEnd).split(',');
 			// Skip this Y-msg if it's the output of the parent coupled model
-			if(pSplit.length<2){ 
+			if(pSplit.length<2){
 				caret += msg.length; continue;
-			} 
+			}
 			// Else, parse it as an output of a valid cell position
 			  p[1] 	= parseInt(pSplit[0],10); 					 // Y coord
 			  p[0] 	= parseInt(pSplit[1],10); 					 // X coord
@@ -139,16 +139,16 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 				yStart	= msg.lastIndexOf('/') + 1;
 				yEnd	= msg.length-1;
 				v 		= parseFloat(msg.substr(yStart, yEnd));
-			}else{	
+			}else{
 				// This log is from Lopez
 				// e.g. "../ out_main / 6.0 /.." becomes port='main', v=6;
 				// e.g. "../ out / 6.0 /.." becomes port='out', v=6;
 				yStart 	= msgSplit[5].indexOf('out_');
-				if(yStart!=-1) 
+				if(yStart!=-1)
 					port = msgSplit[5].substr(yStart+4).trim();
 				else if (msgSplit[5].indexOf('out') != -1) {
 					yStart = 0;
-					port = 'out';			
+					port = 'out';
 				}
 				v 		= parseFloat(msgSplit[6]);
 				// Find port ID (index in the grid.model.ports array)
@@ -157,7 +157,7 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 					// Skip if: invalid port name
 					//      or: 'out' messages (because we're using Lopez ports)
 					caret += msg.length; continue;
-				}	
+				}
 			}
 
 		// Directly access the data buffer and push new Y message
@@ -171,12 +171,12 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 			if(!grid.model.frameBuffer[p[2]][p[1]][p[0]])			  //x
 				grid.model.frameBuffer[p[2]][p[1]][p[0]] = [];
 			grid.model.frameBuffer[p[2]][p[1]][p[0]][portID] = v; 	  //buffer[z][y][x] = v
-			
+
 			// Make a cache copy
-			if(cacheEnabled) 
+			if(cacheEnabled)
 				cache[grid.view.cacheCount][p[2]][p[1]][p[0]][portID] = v; 	  //cache[frame][z][y][x] = v
 		}
-		else{ // Reached end of data for frame oldT. Dump buffer onto new data frame. 
+		else{ // Reached end of data for frame oldT. Dump buffer onto new data frame.
 
 			// Create new data time frame (if not frame 0)
 			if(!util.isEqualArray1D(grid.model.lastT, [0,0,0,0])){
@@ -185,12 +185,12 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 			}
 			else
 				frameIndex = 0;
-			
+
 			// Create new cache frame every CACHE_PERIOD frames
 			if(cacheEnabled && !(frameIndex%cachePeriod))
 				// Deep copy previous cache frame, and post increment counter
 				cache.push(JSON.parse(JSON.stringify(cache[grid.view.cacheCount++])));
-			
+
 			// Fill with log data (frame buffer)
 			var gridCells = data[frameIndex].cells; // shorthand (avoid dereferencing in tight loop)
 			for(var z=0; z<grid.model.dimZ;z++){
@@ -215,11 +215,11 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 			grid.model.lastT = t.slice();							// set next timestamp
 			grid.model.frameBuffer = [];							// clear timeframe
 			grid.model.frameBuffer[p[2]] = [];						// clear layer
-			grid.model.frameBuffer[p[2]][p[1]] = [];				// clear row 
+			grid.model.frameBuffer[p[2]][p[1]] = [];				// clear row
 			grid.model.frameBuffer[p[2]][p[1]][p[0]] = [];			// clear cell
 			grid.model.frameBuffer[p[2]][p[1]][p[0]][portID] = v; 	// store first value
 			if(cacheEnabled)  										// and cache it
-				cache[grid.view.cacheCount][p[2]][p[1]][p[0]][portID] = v;			
+				cache[grid.view.cacheCount][p[2]][p[1]][p[0]][portID] = v;
 		}
 
 		if(eof && isLastChunk){	// process the very last frameBuffer during the very last chunk
@@ -247,7 +247,7 @@ grid.parseYMessages = function(inLog, safeEnd, isLastChunk){
 		}
 
 		// We're done, send caret to next message
-		caret += msg.length; 
+		caret += msg.length;
 
 		//if(!(msgCount%16384))	// Every ~1MB issue progress update
 		//	console.log('\t'+(100*caret/lastYindex).toFixed(5) + '%');
@@ -273,7 +273,7 @@ grid.initializeGridDim = function(){
 						return x;
 					  }();
 	grid.model.dimZ = 1;	// default single layer
-	
+
 	if(!grid.model.dimY || !grid.model.dimX){	// model uses dim() instead of 'width, height'
 		var dim = grid.parseInputAttribute('dim', inp.file['ma-file']);
 		var dimSplit = dim.substring(dim.indexOf('(')+1).split(','); // e.g. dim:(y,x,z)
@@ -286,9 +286,9 @@ grid.initializeGridDim = function(){
 			grid.model.dimX = parseInt(dimSplit[1],10);
 			grid.model.dimZ = parseInt(dimSplit[2],10);
 		} else
-			window.alert(dimSplit.length+"D grids are not supported at the moment. Only 2D and 3D grids are ;(");		
+			window.alert(dimSplit.length+"D grids are not supported at the moment. Only 2D and 3D grids are ;(");
 	}
-	
+
 	console.log('Grid dimensions: (' + grid.model.dimX + ', '+ grid.model.dimY+','+grid.model.dimZ+')');
 }
 
@@ -296,7 +296,7 @@ grid.initializeGridGlobalValue = function(){
 	// Initial global value is 0 by default (|| 0)
 	grid.model.initGlobalValue = parseFloat(grid.parseInputAttribute('initialvalue', inp.file['ma-file'])) || 0;
 	console.log('Global intiial value: '+grid.model.initGlobalValue);
-} 
+}
 grid.initialRowValues = [];
 grid.initializeGridRowValues= function(){
 	var caret=0; // current character index or counter
@@ -319,7 +319,7 @@ grid.initializeGridRowValues= function(){
 			rowCaret = inp.file['ma-file'].indexOf('initialrowvalue', rowCaret);
 		rowCaret = inp.file['ma-file'].indexOf('initialrowvalue', rowCaret+16);
 	}
-} 
+}
 
 grid.initialStValues = [];
 grid.initializeGridStvalues = function(){
@@ -335,7 +335,7 @@ grid.initializeGridStvalues = function(){
 	grid.initialStValues = [];
 
 	// load palette data from file['pal-file']
-	var lines = f.split(/\n/); 
+	var lines = f.split(/\n/);
 	// Type A: [rangeBegin;rangeEnd] R G B
 	for (var i = 0; i<lines.length; i++){
 		var line = lines[i]; //shorthand
@@ -347,7 +347,7 @@ grid.initializeGridStvalues = function(){
 		if(line.length < 4) continue;// probably empty line
 		if((line.indexOf('(')==-1)||
 		   (line.indexOf(')')==-1)||
-		   (line.indexOf('=')==-1)) 
+		   (line.indexOf('=')==-1))
 			continue;	// invalid line
 
 		// Each line looks like this: (y,x,z)=value
@@ -378,7 +378,7 @@ grid.initializeGridPorts = function(){
 	if (portString){
 		// If ports detected, let's split them by whitespace (regex: \s)
 		var tempPorts = portString.split(/\s/);
-		// Get rid of empty strings 
+		// Get rid of empty strings
 		for(var i=0;i<tempPorts.length;i++)
 			if(tempPorts[i]) //("" is false)
 				grid.model.ports.push(tempPorts[i].toLowerCase());
@@ -386,7 +386,7 @@ grid.initializeGridPorts = function(){
 	// end with the default port 'out'
 	grid.model.ports.push('out');
 	console.log('Ports: ' + grid.model.ports);
-} 
+}
 
 grid.model.components = [];
 grid.initializeGridComponents = function(){
@@ -397,7 +397,7 @@ grid.initializeGridComponents = function(){
 	if (componentString){
 		// If ports detected, let's split them by whitespace (regex: \s)
 		var tempPonent = componentString.split(/\s/);
-		// Get rid of empty strings 
+		// Get rid of empty strings
 		for(var i=0;i<tempPonent.length;i++)
 			if(tempPonent[i]) //("" is false)
 				grid.model.components.push(tempPonent[i].toLowerCase());
@@ -406,7 +406,7 @@ grid.initializeGridComponents = function(){
 		grid.model.components.push('')
 	// end with the default port 'out'
 	console.log('Components: ' + grid.model.components);
-} 
+}
 
 
 grid.initializeGridData = function(){
@@ -426,7 +426,7 @@ grid.initializeGridData = function(){
 	var ports = grid.model.ports; //shorthand
 	// create Initial ports array, and fill it with 0's
 	var initialPorts = []; for (var i=ports.length;i-->0;) initialPorts.push(0);
-	
+
 	// CACHE prep
 	var cacheEnabled = grid.view.CACHE_ENABLED;//shorthand for tight loop
 	if(cacheEnabled){
@@ -448,7 +448,7 @@ grid.initializeGridData = function(){
 			var j;
 			// check if this is a pre-intialized row
 			for (var i=grid.initialRowValues.length;i-->0;){
-				if(y == grid.initialRowValues[i].rowID && z==0){ 
+				if(y == grid.initialRowValues[i].rowID && z==0){
 					// Match found (applicable only to first)
 					found = true;
 					j = i;
@@ -467,10 +467,10 @@ grid.initializeGridData = function(){
 				for (var x = grid.model.dimX; x-->0;){
 					var vPorts = initialPorts.slice(); // copy initial empty ports vector
 					vPorts[0] = parseFloat(grid.initialRowValues[j].rowValues[x]);	// initialize first port only
-					grid.model.data[0].cells.push({position:[x,y,z],value:vPorts.slice()}); 
+					grid.model.data[0].cells.push({position:[x,y,z],value:vPorts.slice()});
 					if(cacheEnabled) cache[0][z][y][x] = vPorts.slice(); // cache copy
 				}
-			}		
+			}
 		}
 	}
 
@@ -479,21 +479,21 @@ grid.initializeGridData = function(){
 	var initValues = grid.initialStValues;
 	for(var i=0; i<initValues.length; i++){
 		var ps = initValues[i].position;
-		var vPorts = initialPorts.slice(); // copy initial empty ports vector 
+		var vPorts = initialPorts.slice(); // copy initial empty ports vector
 		vPorts[0] = initValues[i].value;
-		data[0].cells.push({position: initValues[i].position.slice(), 
+		data[0].cells.push({position: initValues[i].position.slice(),
 						    value: 	  vPorts.slice() });
 		if(cacheEnabled) cache[0][ps[2]][ps[1]][ps[0]] = vPorts.slice(); // cache copy
 	}
 
 	// We just created a new frame (frame #0)
-	grid.model.frameCount++; 
+	grid.model.frameCount++;
 }
 
 grid.initializePalette = function(){
 	// Exit if the palette isn't properly loaded (can insert UI feedback here)
 	if(!inp.file['pal-file']){
-		// 
+		//
 		window.alert("No Color Palette file was chosen. Using default palette instead: [-100;100] 160 160 180");
 		// Announce we couldn't load a palette file; load default
 		document.getElementById('pal-file').parentNode.children[3].innerHTML = '<b>No pal loaded!<br>Using default.</b>';
@@ -517,12 +517,12 @@ grid.initializePalette = function(){
 			var rgbLine = L.substr(L.indexOf(']')+2).trim();
 			var rgb = rgbLine.split(' ');
 			for(var j=rgb.length;j-->0;) 				// clean empty elements
-				if(rgb[j].trim()=="") 
+				if(rgb[j].trim()=="")
 					rgb.splice(j, 1);
 			var r = parseInt(.95*parseInt(rgb[0],10));	// Parse as decimal int
 			var g = parseInt(.95*parseInt(rgb[1],10));	// Parse as decimal int
 			var b = parseInt(.95*parseInt(rgb[2],10));	// Parse as decimal int
-			grid.palette.push([[begin,end],[r,g,b]]);	// Save to palette
+			grid.palette.push([[begin,end],[r,g,b],"-"]);	// Save to palette
 		}
 	}
 	else{
@@ -534,24 +534,24 @@ grid.initializePalette = function(){
 			var components = lines[i].split(',');
 			if(components.length == 2) {	// this line is a value range [start, end]
 				// Use parseFloat to ensure we're processing in decimal not oct
-				paletteRanges.push([parseFloat(components[0]), parseFloat(components[1])]); 
+				paletteRanges.push([parseFloat(components[0]), parseFloat(components[1])]);
 			}
 			else if (components.length == 3){ //this line is a palette element [R,G,B]
 				// Use parseInt(#, 10) to ensure we're processing in decimal not oct
-				paletteColors.push([parseInt(.95*parseInt(components[0],10)), 
-									parseInt(.95*parseInt(components[1],10)), 
-									parseInt(.95*parseInt(components[2],10))]); 
+				paletteColors.push([parseInt(.95*parseInt(components[0],10)),
+									parseInt(.95*parseInt(components[1],10)),
+									parseInt(.95*parseInt(components[2],10))]);
 			}
 		}
 		console.log(paletteColors);
 		// populate grid palette object
 		for (var i=paletteRanges.length; i-->0;){
-			grid.palette.push([paletteRanges[i], paletteColors[i] || [0,0,0]]); // default to RGB=[0,0,0]
+			grid.palette.push([paletteRanges[i], paletteColors[i] || [0,0,0],"-"]); // default to RGB=[0,0,0]
 		}
-	}	
+	}
 }
 
-// Element-wise comparison between two 1D arrays. 
+// Element-wise comparison between two 1D arrays.
 util.isEqualArray1D = function(arrayA, arrayB){
 	if (!arrayA || !arrayB || (arrayA.length != arrayB.length))
 		return false;
@@ -585,5 +585,5 @@ grid.modelMain = function(){
 		alert("Please select or drag'n'drop a model first");
 		return;
 	}
-	setTimeout(grid.viewMain(), 500);	
+	setTimeout(grid.viewMain(), 500);
 }
