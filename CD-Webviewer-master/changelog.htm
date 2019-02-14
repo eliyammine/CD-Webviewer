@@ -1,0 +1,79 @@
+<style type="text/css">
+	@import url(http://fonts.googleapis.com/css?family=Roboto);
+	body{font-family: 'Roboto',sans-serif; max-width:740px;}
+	a{color:#4A8587;}
+	ul{margin-top: 0;}
+</style>
+<h2>Viscrete API - Changelog</h2>
+<a href="http://omarhesham.com/arslab/webviewer">www.omarhesham.com/arslab/webviewer</a>
+<hr>
+<b>Limitations:</b>
+<li>No support yet for 4+ dimensional models.</li>
+<li>No support yet for coupled model (multi-component) logs. It currently defaults to only view the first declared component.</li>
+<hr>
+<b>v 0.080</b><ul>
+	<li>Fixed: video recording works again for any number of "layout columns". </li>
+		<ul><li>Note: transparent pixels broke Whammy's compile(); so careful around calls like clearRect().</li></ul>
+		<ul><li><i>Thanks</i> to Augustin Ismael Montero and Ekambir Sidhu for reporting this issue.</li></ul>
+</ul>
+<b>v 0.076</b><ul>
+	<li>Change: The file input can now handle multiple files.</li>
+	<ul><li><i>Thanks</i> to  Bruno St-Aubin for contributing to this change.</li></ul>
+</ul>
+<b>v 0.075</b><ul>
+	<li>Fixed: output (Y) messages of the parent coupled model no longer halt the parsing of the simulation log.</li>
+	<ul><li><i>Thanks</i> to  Ifeoluwa Oyelowo for contributing to this fix.</li></ul>
+</ul>
+<b>v 0.074</b><ul>
+	<li>Fixed: Palette file (*.pal) loading is no longer whitespace-sensitive; more robust handling of .pal file format.</li>
+	<ul><li><i>Thanks</i> to Victor Guida Silva for contributing to this fix.</li></ul>
+</ul>
+<b>v 0.073</b><ul>
+	<li>Fixed: in some cases, the component name in the log has a dash (-) in it, even though the declared name in the .ma file doesn't (e.g. "3dlife" in MA, but "3d-life" in LOG). That case is now detected properly.</li>
+	<ul><li>Todo: investigate this and other peculiarities from the engine docs (if available)</li></ul>
+	<ul><li>Todo: fully support multiple components in a single log file.</li></ul>
+</ul>
+
+<b>v 0.070</b><ul>
+	<li>Added: full-frame periodic caching (default of 1 every 10 frames); similar in effect to storing I-frames in MPEG compression.</li>
+	<ul><li>Todo: allow user to selectively cache specific frames (not just periodic)</li></ul>
+	<li>Added: thanks to caching, we can implement backwards playback and random timeline seeking (to the nearest cache point)</li>
+	<li>Added: parsing the 'components' list from the MA file; limited to visualizing the first component only</li>
+	<ul><li>Todo: fully support multiple components in a single log file.</li></ul>
+</ul>
+
+<b>v 0.065</b><ul>
+	<li>Added: last-frame caching. Allows redrawing the entire frame if view settings change (e.g. user unchecks 'show values'). Previously, the timeline had to be reset to 0 everytime (because we only store the incremental changes each frame; a necessary optimization for smooth playback of large grids and multiple layers). Now with last-frame caching, we fully store the most recent full-frame (and only that), so we can redraw it whenever the user changes any view settings.</li>
+</ul>
+
+<b>v 0.060</b><ul>
+	<li>Added: support for layers (for classical 3D models)</li>
+	<li>Added: support for ports (from lopez simulator). Watch the demo: <a href='https://youtu.be/2uWq1Rx5bqw' target="_blank">youtu.be/2uWq1Rx5bqw</a></li>
+	<li>Added: UI enhancements and a more official look</li>
+</ul>
+
+<b>v 0.050</b><ul>
+	<li>Fixed: multiple bugs related to initial frame (frame 0) and differentiating between log sources (lopez, dcd++, spanish versions, etc.)</li>
+</ul>
+
+<b>v 0.040</b><ul>
+	<li>Added: basic support for single-port ('out') lopez logs</li>
+</ul>
+
+<b>v 0.030</b><ul>
+	<li>Added: exporting to video is now a button (with user-defined fps). Watch the demo: <a href="https://youtu.be/odaDOQC2-yQ" target="_blank">youtu.be/odaDOQC2-yQ</a>
+	    <ul><li>Todo: allow user to customize recording range, resolution, etc.</li></ul>
+	</li>
+</ul>
+
+<b>v 0.020</b><ul>
+	<li>Added: loading log files in small chunks, allowing it to process gigabytes of log data in minutes. Watch the demo: <a href="https://youtu.be/sMOr1yHeJso" target="_blank">youtu.be/sMOr1yHeJso</a>
+	    <ul><li>Todo: we still run out of browser memory when the processed file is too big (>5GB). Need a purely stream-only mode that accesses disk whenever the live chunk needs updating. Or maybe set a dynamic live cache limit (instead of a small chunk).</li></ul>
+	</li>
+</ul>
+
+<b>v 0.010</b><ul>
+	<li>First prototype. Available here: <a href="http://www.omarhesham.com/arslab/testing/grid.htm">www.omarhesham.com/arslab/testing/grid.htm</a></li>
+	<li>Highlights: asynchronous data streaming; random timeline seeking; platform-independent (anything that runs Chrome, even mobile); and pure client-side JavaScript (doesn't require internet)</li>
+	<ul><li>Todo: separate the application from the core functions. Turn core into API.</li></ul>
+</ul>
