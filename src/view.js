@@ -460,6 +460,7 @@ grid.toggleGridOverlay = function(){
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 	grab('gridOverlayColor').disabled = !grab('showGridOverlay').checked;
+	drawOutline();
 }
 
 grid.updateGridOverlayColor = function(){
@@ -781,7 +782,7 @@ function selectCell(event) {
 	ctx.lineWidth = 5;
 	if (grid.SelectedCells.length == 0) {
 		grid.SelectedCells.push(new cell(cellX, cellY, layer));
-		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL);
+		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL-3, SCL-3);
 	}
 	else {
 		var found = false;
@@ -794,7 +795,7 @@ function selectCell(event) {
 		}
 		if (!found) {
 			grid.SelectedCells.push(new cell(cellX, cellY, layer));
-			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL, SCL);
+			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL-3, SCL-3);
 		}
 	}
 	grab('StatsOverlay').style.display = "none";
@@ -808,9 +809,11 @@ function cell(x,y,z) {
 
 function drawOutline() {
 	ctx = canvas.getContext("2d");
+	ctx.lineWidth = 5;
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
-		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL, SCL);
+		console.log(grab('gridOverlayColor').value);
+		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL-3, SCL-3);
 	}
 }
 
