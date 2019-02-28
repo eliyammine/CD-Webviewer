@@ -470,6 +470,7 @@ grid.toggleGridOverlay = function(){
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 	grab('gridOverlayColor').disabled = !grab('showGridOverlay').checked;
+	drawOutline();
 }
 
 grid.updateGridOverlayColor = function(){
@@ -982,6 +983,7 @@ function cell(x,y,z) {
 
 function drawOutline() {
 	ctx = canvas.getContext("2d");
+	ctx.lineWidth = 5;
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
 		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL-3, SCL-3);
