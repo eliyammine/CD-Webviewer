@@ -36,7 +36,7 @@ Viz.data = {
 		this.z = z;
 		this.port = port;	
 		this.track = track;	
-		
+		this.cellsStates = [];
 		this.UpdateTime(0);
 		
 		var maxT = grid.model.data.length - 1;
@@ -75,6 +75,17 @@ Viz.data = {
 					else if (Array.isArray(clss) && state > clss[0] && state < clss[1]) this.states[clss]++;					
 				}
 			}
+		}
+	},
+		UpdateCellsStates : function(fb, selected) {
+		for (var i = 0; i < selected.length; i++) {
+			var sel = selected[i];
+			
+			if (!this.cellsStates[sel.z]) this.cellsStates[sel.z] = [];
+			if (!this.cellsStates[sel.z][sel.y]) this.cellsStates[sel.z][sel.y] = [];
+			if (!this.cellsStates[sel.z][sel.y][sel.x]) this.cellsStates[sel.z][sel.y][sel.x] = [];
+			
+			this.cellsStates[sel.z][sel.y][sel.x].push(fb[sel.z][sel.y][sel.x][0]);			
 		}
 	},
 	
@@ -122,22 +133,136 @@ Viz.data = {
 		
 		return Viz.Utils.map(this.track, function(value) { return this.states[value]; }.bind(this));
 	},
+		CellsStateAsArray : function(selected) {
+		var data = [];
+		
+		for (var i = 0; i < selected.length; i++) {
+			var sel = selected[i];			 
+			var id = [sel.z, sel.y, sel.x].join(".");			 
+			data.push({ id:id, values:this.cellsStates[sel.z][sel.y][sel.x] });	
+		}
+		
+		return data;
+	},
 	
-	UpdateTime : function(t, fb, fbSel) {
-		if (t == 0) this.transitions = this.ResetTransitions();
+	UpdateTime : function(t, fb, selected) {
+			if (t == 0) this.transitions = this.ResetTransitions();
 		
 		else this.ApplyTransitions(t);
 		
+		if (selected) this.UpdateCellsStates(fb, selected);
+		
 		if (grid.SelectedCells.length != 0) {
-			fb = fbSel;
+			fbSel = [[[]]]
+			var array = grid.SelectedCells;
+			for (var i in array) {
+				fbSel[0][0][i]=fb[array[i].z][array[i].y][array[i].x];
+			}
+			fb=fbSel;
 		}
 		if (fb) this.UpdateStates(fb);
 		
-		this.t = t;		
+		this.t = t;	
 	}
 }
 
 Viz.charting = {
+	
+	BuildCellsStateChart : function(pNode, type, margin) {
+		var chart = this.BuildChart(pNode, type, margin);
+		
+		// Title Preparation
+		this.AddTitle(chart, "Cells State Chart");
+
+		chart.x = d3.scaleLinear().rangeRound([0, chart.size.w]);
+		chart.y = d3.scaleLinear().rangeRound([chart.size.h, 0]);
+		
+		chart.line = d3.line()
+					   .x(function(d, i) { return chart.x(i)})
+					   .y(function(d, i) { return chart.y(d)});
+					   
+	    chart.x.domain([0, grid.model.data.length]);
+		
+		var min = d3.min(grid.palette, function(d) { return d[0][0]; });
+		var max = d3.max(grid.palette, function(d) { return d[0][1]; });
+		
+	    chart.y.domain([min, max]);
+
+		var axis = d3.axisBottom(chart.x);
+		
+		chart.xaxis = chart.g.append("g")
+						     .attr("class", "axis axis--x")
+						     .attr("transform", "translate(0," + chart.size.h + ")")
+						     .call(axis);
+		
+		chart.yaxis = chart.g.append("g")
+						     .attr("class", "axis axis--y")
+						     .call(d3.axisLeft(chart.y));
+							 
+		chart.g.append("g").append("text")
+						.attr("class", "x label")
+						.attr("text-anchor", "middle")
+						.attr("x", chart.size.w/2)
+						.attr("y", chart.size.h+40)
+						.text("Frame");
+		
+		chart.g.append("g").append("text")
+					.attr("class", "y label")
+					.attr("text-anchor", "end")
+					.attr("y", -50)
+					.attr("dy", "1.2em")
+					.attr("transform", "rotate(-90)")
+					.text("State");
+		chart.Update = function(data) {
+			
+			var data= data;
+		
+			if (data.length == 0) return;
+			
+			 //var color = d3.scale.category20();
+	
+			
+			
+			var enter = chart.g.selectAll(".line")
+							   .data(data, function(d, i) { return data[i].id; })
+							   .enter().append("path")
+							   .attr("class", "line")
+							   .attr("fill", "none")
+							   .attr("stroke", function(d,i){return "hsl(" + (((Math.random() * 1000) + (Math.random()*360)+ (Math.random()*500))%360 )+ ",100%,50%)";})
+							   .attr("stroke-linejoin", "round")
+							   .attr("stroke-linecap", "round")
+							   .attr("data-legend","legend")
+							   .attr("stroke-width", 1.5)
+						
+							   
+			chart.g.selectAll(".line").attr("d", function(d) { return chart.line(d.values); });
+			
+	
+			var colorScheme = [] ;
+			chart.g.selectAll(".line").each(function(d,i){
+				colorScheme.push(d3.select(this).attr("stroke"));
+			});
+			
+			var w=370;
+			
+			var chartWindow = d3.select(".chart-container");
+			var leg = chart.g.selectAll(".lgd")
+					.data(colorScheme, function(d, i) { return colorScheme[i].id; })
+					.enter().append("g").append("text")
+					.attr("class","lgd")
+					.attr("x", 290)  // space legend
+					.attr("y", function(d, i) { return w-=15;})
+					.attr("class", "legend") 
+					.style("fill", function(d, i) { // Add the colours dynamically
+									return colorScheme[i]; })
+					.text(function(d, i) { return "("+((data[i].id).split(".")).join(",")+")";}); 	
+					
+			 
+		}
+					
+  
+		return chart;
+	},
 	BuildTransitionsChart : function(pNode, type, margin) {	
 		var chart = this.BuildChart(pNode, type, margin);
 		
@@ -370,6 +495,15 @@ Viz.charting = {
 		
 		if (type) classes.push(type);
 		
+		if (type === 'state'){
+			d3.select(pNode).append('br');
+			var button = d3.select(pNode).append("button")
+									 .attr('id', 'ruby')
+									 .style('text-align', 'right')
+									 .text('Minimize')
+									 .attr('onclick', 'minStatsZone()');
+		}
+		
 		var div = d3.select(pNode).append("div").attr("class", classes.join(" "));
 		var div = div.append("div").attr("class", "chart");
 		
@@ -411,10 +545,12 @@ Viz.charting = {
 
 Viz.stats = {
 	Build : function(pNode, data) {
-		var classes = ["chart-container"];
+		var classes = ["chart-container","changeStats"];		
+	 
 		
-		var div = d3.select(pNode).append("div").attr("class", classes.join(" "));
-
+		var div = d3.select("#lineBox").append("div");
+		
+		
 		var stats = {
 			root : div.append("div").attr("class", "chart stats")
 		}

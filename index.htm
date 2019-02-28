@@ -15,6 +15,7 @@
    <link rel='shortcut icon' href='favicon.ico'>
    <meta name="viewport" content="user-scalable=no" />
    <title>CellDEVS Simulation Viewer | ARS Lab | Carleton University</title>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -40,10 +41,19 @@
       </div>
 
      <br>
-
+	<div id='min-button-window-input' style='display:inline-flex;'>
+     </div>
+      <div id='min-button-window-canvas' style='display:inline-flex;'>
+     </div>
+      <div id='min-button-window-stats' style='display:inline-flex;'>
+     </div>
      <div id='basic-view'>
                <div id="inputzone">
             <div id="dropzone">
+				&nbsp;
+                <div class='min-button' style='text-align:right;'>
+                  <button style='box-shadow:none;' onclick='minInputZone()'><i class="fa fa-minus-square" aria-hidden="true"></i> Minimize</button>
+                </div>
                <div style="text-align: left; margin-left:10px;color:#aaa"><br><b>Input files</b> - Drag and drop or click to browse:<br></div>
 
             <div class="dz" id="maFile">
@@ -169,24 +179,41 @@
 
    <!-- END OF STICKY DIV - END OF MAIN CONTENT -->
 
-   <div id="chartsDiv" class="charts-container"></div>
+   <div id="chartsDiv" class="charts-container" style='text-align:right;padding-right:20px;'></div>
    <div id="StatsOverlay" style= "display: none"></div>
    <div id="canvyDiv" style="display: none">
    <div class="canvas-btn-container">
+	  <button type='button' class='button' onclick='minCanvasZone()'><i class="fa fa-minus-square" aria-hidden="true"></i></button>
    	  <button type='button' title="Zoom on cells" class="button" id=zoomButton style="background-color:red"; onclick="toggleZoom()";>&#x1F50D;</button>
 	  <button type='button' title="Information Tooltip" class="button" id=tipButton  style="background-color:red"; onclick="toggleTip()";>&#x1f6c8;</button>
 	  <button type='button' title="Show Values" class="button" id=showValuesButton  style="background-color:red"; onclick="grid.toggleValueDisplay()";>&#x23;</button>
 	  <button type='button' title="Fixed-Precision Values" class="button" id=showFixedPrecision  style="background-color:red" onclick="grid.toggleFixedPrecision()"; disabled>.xx</button>
 	  <button type='button' title="Show Zeros" class="button" id=showZeros  style="background-color:red"; onclick="grid.toggleZeroDisplay()"; disabled>&#x30;</button>
 	  <button type='button' title="Clear Selection" class="button" id=clearSelection  style="background-color:white"; onclick="clearSelectedCells()";>X</button>
+	  <button type='button' title="Show Stats" class="button" id=showStats  style="background-color:white"; onclick="showStats()";>S</button>
 	</div>
       <canvas id="canvy" style= "display: none"></canvas>
 	  <canvas id="zoom" width= "400" height="400" style="position:absolute; top:0; left:0; display:none"></canvas>
 	  <div id=tip></div>
    </div>
-
+   <dialog id="lineGraphDialog">
+    <style>
+      .line-chart
+      {
+          border: 1px solid lightgray;
+      }
+    </style>
+		<div id='lineBox'>
+          </div>	
+        <footer>
+          <button onclick='closeLineDialog();' type='reset'>Close</button>
+        </footer>
+    </dialog>
+	
+	
    <script src="references/whammy.js"></script>
    <script src="references/d3-4.12.0/d3.min.js"></script>
+   <script src="references/d3.legend.js"></script>
    <script src="src/view.js"></script>
    <script src="src/data.js"></script>
    <script src="src/model.js"></script>

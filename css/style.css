@@ -249,9 +249,8 @@ label{
 	margin-bottom: 20px;
 }
 .charts-container {
-
     height: auto;
-	width:400px;
+	width:420px;
 	padding:0px;
 }
 
@@ -259,6 +258,9 @@ label{
 	height : 280px;
 }
 
+.chart-container.cellsState { 
+	height : 480px;
+}
 
 .chart-container.activity {
 	height : auto;
@@ -274,7 +276,7 @@ label{
     position: relative;
     height: 100%;
 	margin : 8px;
-    display: block;
+    display: hidden;
     border: dotted thin rgb(107,107,107);
 	border-radius : 4px;
 }
@@ -669,3 +671,25 @@ input:checked + .slider:before {
   -ms-transform: translateX(126px);
   transform: translateX(126px);
 }
+
+.style-lengend{
+   top: 10;
+   left: 20;   
+
+}
+
+#chartsDiv .charts-container:nth-of-type(1){
+	display:none !important;
+}
+
+.changeStats{
+  display:none;	
+	
+}
+
+#lineGraphDialog{
+	position:absolute;
+	width:400px;
+}
+
+

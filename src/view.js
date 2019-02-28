@@ -94,9 +94,19 @@ grid.loadSimulation = function(){
 	//palette edition init
 	grab("BtnEditPalette").style.display = "inline-block";
 	grab("BtnEditPalette").disabled = false;
+	minInputZone();
 	document.getElementById("play-controls").style.display = 'block';
 	d3.selectAll("#paletteDiv").remove();
 }
+
+function closeLineDialog(){
+	var lineBox = grab('lineBox');
+	//lineBox.innerHTML = '';
+	var lineDialog = grab('lineGraphDialog');
+	lineDialog.close();
+}
+
+
 
 grid.setupGrid = function(){
 	//Show canvas
@@ -401,7 +411,7 @@ grid.updateGridView = function(){
 	// Layer layout and title bars have been updated
 	grid.view.layersNeedUpdate = false;
 	grid.updateTimelineView();
-	grid.updateCharts(grid.view.currentTimeFrame, grid.view.viewBuffer);
+	grid.updateCharts(grid.view.currentTimeFrame, grid.view.viewBuffer,canvas.selected);
 	drawOutline();
 }
 
@@ -460,7 +470,6 @@ grid.toggleGridOverlay = function(){
 	grid.view.redrawRequested = true;
 	grid.updateGridView();
 	grab('gridOverlayColor').disabled = !grab('showGridOverlay').checked;
-	drawOutline();
 }
 
 grid.updateGridOverlayColor = function(){
@@ -649,10 +658,14 @@ grid.toggleCharts = function(z, port) {
 	if(grab('showStateFreq').checked) charts.states = Viz.charting.BuildStatesChart(grab('chartsDiv'), "state", [70, 40, 20, 50]);
 	if(grab('showTransitions').checked) charts.transitions = Viz.charting.BuildTransitionsChart(grab('chartsDiv'), "activity", [50, 50, 50, 50]);
 	if(grab('showStats').checked) stats = Viz.stats.Build(grab('chartsDiv'), Viz.data);
+	
+	charts.cellsState = Viz.charting.BuildCellsStateChart(grab('chartsDiv'), "cellsState", [50, 50, 50, 50]);
+	
 	grid.updateGridView();
 }
 
-grid.updateCharts = function(t, fb) {
+grid.updateCharts = function(t, fb,selected) {
+	/*
 	fbSel = [[[]]]
 	if (grid.SelectedCells.length == 0) {
 		Viz.data.UpdateTime(t, fb);
@@ -667,9 +680,20 @@ grid.updateCharts = function(t, fb) {
 
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
+	//if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
+	
+	charts.cellsState.Update(Viz.data.CellsStateAsArray(selected));
+	
+	*/
+	Viz.data.UpdateTime(t, fb, selected);
+
+	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
+	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
+
+	charts.cellsState.Update(Viz.data.CellsStateAsArray(selected));
+	
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
 }
-
 function getMousePos(canvas, event) {
 	var rect = canvas.getBoundingClientRect();
 	return {
@@ -679,6 +703,9 @@ function getMousePos(canvas, event) {
 }
 
 var canvas = grid.view.canvy;
+canvas.selected = [];
+
+
 canvas.addEventListener('mousemove', function(event) {
 	var fb = grid.view.viewBuffer;
 	if (tipStatus) {
@@ -704,6 +731,42 @@ canvas.addEventListener('mousemove', function(event) {
 		ToolTip.style.top=(event.pageY)+23 + 'px';
 	}
 }, false);
+
+
+
+function minInputZone(){
+	grab('inputzone').style.display = 'none';
+	grab('min-button-window-input').innerHTML += '<button onclick="maxInputZone()">Input Files</button>'
+}
+
+
+
+function maxInputZone(){
+	grab('inputzone').style.display = 'block';
+	grab('min-button-window-input').innerHTML = '';
+}
+
+function minStatsZone(){
+	grab('chartsDiv').style.display = 'none';
+	grab('min-button-window-stats').innerHTML += '<button onclick="maxStatsZone()">Loaded Statistics</button>';
+}
+
+
+function maxStatsZone(){
+	grab('chartsDiv').style.display = 'inline-table';
+	grab('min-button-window-stats').innerHTML = '';
+}
+
+function minCanvasZone(){
+	grab('canvyDiv').style.display = 'none';
+	grab('min-button-window-canvas').innerHTML += '<button onclick="maxCanvasZone()">Loaded Canvas</button>'
+}
+
+function maxCanvasZone(){
+	grab('canvyDiv').style.display = 'inline-table';
+	grab('min-button-window-canvas').innerHTML = '';
+}
+
 
 function getCellValue (mousePos) {
 		var portID = 0;
@@ -770,7 +833,117 @@ function showZoom(event) {
 	}
 }
 
-canvas.addEventListener('click',selectCell,false);
+canvas.addEventListener('click', function(event){	
+		var mousePos = getMousePos(canvas, event);
+		
+		var portID = 0;
+		var layer =0;
+		var fb = grid.view.viewBuffer;
+		
+		var height = canvy.height / grid.model.dimY;
+		var width = canvy.width / grid.model.dimX;
+
+		var cellX = Math.round((mousePos.x-20)/width);
+		var cellY = Math.round((mousePos.y-18)/height);
+		var cellZ = portID;
+		
+		this.selected.push({x:cellX, y:cellY, z:cellZ});
+		selectCell(event);
+		return;
+		
+		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
+			cellY=Math.round((mousePos.y+15)/height);
+			cellY=cellY - grid.model.dimY -1;
+			layer++;
+		}
+		
+		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
+		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
+		if (cellX == -1) cellX =0;
+		if (cellY == -1) cellY =0;
+
+		var boxX = grab('posX');
+		var boxY = grab('posY');
+		var statesBox = grab('states-box');
+		var transitions = grab('transitions');
+		var lineBox = grab('lineBox');
+
+		lineBox.innerHTML += '<svg id="line-graph"></svg>';
+
+		boxX.innerHTML = 'position X: ' + cellX;
+		boxY.innerHTML = 'position Y: ' + cellY;
+		statesBox.innerHTML = 'states: ' + fb[layer][cellY][cellX][portID];
+		transitions.innerHTML = 'transitions: ' + Viz.data.transitions[cellX][cellY];
+
+
+		var timeline = Array.apply(null, {length: 9}).map(Number.call, Number);
+		var data = [];
+	    for (var i in timeline) {
+    	  var randomnumber = Math.floor(Math.random() * (4 - 0 + 1));
+	      data.push(
+	         {
+	            time: i, // timeframe
+	            value: randomnumber // states
+	         });
+   		}
+
+		var svgWidth = 600, svgHeight = 400;
+	    var margin = { top: 20, right: 20, bottom: 30, left: 50 };
+	    var width = svgWidth - margin.left - margin.right;
+	    var height = svgHeight - margin.top - margin.bottom;
+
+
+
+   		var svg = d3.select('#line-graph').attr("width", svgWidth).attr("height", svgHeight);
+   		var g = svg.append("g")
+				   .attr("transform", 
+				      "translate(" + margin.left + "," + margin.top + ")"
+				   );
+
+		var x = d3.scaleLinear().rangeRound([0, width]);
+		var y = d3.scaleLinear().rangeRound([height, 0]);
+		var line = d3.line()
+					   .x(function(d) { return x(d.time)})
+					   .y(function(d) { return y(d.value)})
+	    x.domain(d3.extent(data, function(d) { return d.time }));
+	    y.domain(d3.extent(data, function(d) { return d.value }));
+
+		g.append("g")
+		   .attr("transform", "translate(0," + height + ")")
+		   .call(d3.axisBottom(x))
+		   .select(".domain")
+		   .remove();
+
+
+		g.append("g")
+		   .call(d3.axisLeft(y))
+		   .append("text")
+		   .attr("fill", "#000")
+		   .attr("transform", "rotate(-90)")
+		   .attr("y", 6)
+		   .attr("dy", "0.71em")
+		   .attr("text-anchor", "end")
+		   .text("States (#)");
+
+		g.append("path")
+			.datum(data)
+			.attr("fill", "none")
+			.attr("stroke", "steelblue")
+			.attr("stroke-linejoin", "round")
+			.attr("stroke-linecap", "round")
+			.attr("stroke-width", 1.5)
+			.attr("d", line);
+
+		g.append("text")
+            .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
+            .attr("transform", "translate("+ (width/2) +","+(height-(50/3))+")")  // centre below axis
+            .text("Timeline (10 frames per unit)");		
+		var lineDialog = grab('lineGraphDialog');
+		lineDialog.showModal();
+	
+	
+}, false);
+
 function selectCell(event) {
 	var mousePos = getMousePos(canvas,event);
 	var value = getCellValue(mousePos);
@@ -809,7 +982,6 @@ function cell(x,y,z) {
 
 function drawOutline() {
 	ctx = canvas.getContext("2d");
-	ctx.lineWidth = 5;
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
 		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL-3, SCL-3);
@@ -924,3 +1096,28 @@ document.getElementById('basic-view-button').addEventListener('click', function(
         document.getElementById('advanced-view').style.display ='none';
        }
     });
+	
+	
+	
+
+function showStats(){
+    var lineDialog = grab('lineGraphDialog');
+	lineDialog.showModal();
+	var canvas = grid.view.canvy;
+	var pos = canvas.getBoundingClientRect();	
+    var div = d3.select("#lineGraphDialog");	
+	//div.attr('width',600);
+	div.attr('left',pos.left + 200);
+	div.attr('top',pos.top - 200);
+	
+	
+	
+   var stat = document.getElementsByClassName('changeStats');	
+	if(stat[0].style.display == '' || stat[0].style.display == 'none'){
+        stat[0].style.display = 'inline-block';		
+   }
+   else {	
+        stat[0].style.display = 'none';
+		
+   }
+}
