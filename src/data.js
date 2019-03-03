@@ -37,27 +37,26 @@ inp.processDroppedFiles = function(f){
 			box.innerHTML = file.name+'<font color=#f7c933><br><b>Ready to parse</b></font>';
 		}
 		else processFile(box, m[1], file);
-		
 		// [TODO] Use internally defined model name, not file name.
 		// Store file name (sans extension) as model name. 
 		if(m[1] == 'ma') grid.model.name = file.name.slice(0, file.name.lastIndexOf('.'));
 	}
-	
-	function processFile(box, ext, file) {
-		var fId = ext + "-file";
+}
 
-		box.innerHTML = file.name + '<font color=#f7c933><br><b>Processing...</b></font>';	// indicate file started processing
+function processFile(box, ext, file) {
+	var fId = ext + "-file";
+
+	box.innerHTML = file.name + '<font color=#f7c933><br><b>Processing...</b></font>';	// indicate file started processing
 		
-		var fReader = new FileReader();
+	var fReader = new FileReader();
 
-		fReader.readAsText(file);
+	fReader.readAsText(file);
 			
-		fReader.onloadend = function(){ 
-			inp.file[fId] = fReader.result; 
+	fReader.onloadend = function(){ 
+		inp.file[fId] = fReader.result; 
 			
-			box.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 	// indicate file loaded
-		}		
-	}
+		box.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 	// indicate file loaded
+	}		
 }
 
 /**
@@ -152,3 +151,66 @@ inp.parseYChunks = function(){
 
 // [TODO] Load the RISE settings .xml file
 //grid.loadRISExml = function(){}
+
+function switchtoStandard() {
+	var standard = grab('Standard');
+	var RISE = grab('RISE');
+	
+	standard.style.display='block';
+	RISE.style.display='none';
+}
+
+function switchtoRISE() {
+	var standard = grab('Standard');
+	var RISE = grab('RISE');
+		
+	standard.style.display='none';
+	RISE.style.display='block';	
+}
+grid.loadRISExml = function(f) {
+	var file = f.files[0];
+	var filename = file.name;
+	if (filename.split('.').pop() == 'xml') {
+		//process xml file, upload to server
+		grid.simulateRise(file);
+		
+	}
+}
+
+grid.loadRISEzip = function(f) {
+	var file = f.files[0];
+	var filename = file.name;
+	if (filename.split('.').pop() == 'zip') {
+	JSZip.loadAsync(file).then(function (f) {
+		Object.keys(f.files).forEach(function (filename) {
+			f.files[filename].async('string').then(function (fileData) {
+					filename_ext = filename.split('.').pop();
+					var box = document.getElementById(filename_ext + "-file").parentNode.children[3];
+					if (filename_ext == "ma") {
+						var model_file = new File([fileData], filename, {
+							type: "text/plain",
+						});
+						grid.model.name = file.name.slice(0, file.name.lastIndexOf('.'));
+						processFile(box, "ma", model_file);
+						//Model File
+					}
+					else if (filename_ext == "val") {
+						//value file
+						var value_file = new File([fileData], filename, {
+							type: "text/plain",
+						});
+						processFile(box, "val", value_file);
+					}
+					else if (filename_ext == "pal") {
+						//pallete file
+						var pallete_file = new File([fileData], filename, {
+							type: "text/plain",
+						});
+						processFile(box, "pal", pallete_file);
+					}
+				})
+			})
+		})
+    }
+}
+	

@@ -1099,9 +1099,6 @@ document.getElementById('basic-view-button').addEventListener('click', function(
        }
     });
 	
-	
-	
-
 function showStats(){
     var lineDialog = grab('lineGraphDialog');
 	lineDialog.showModal();

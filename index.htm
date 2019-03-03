@@ -48,14 +48,16 @@
       <div id='min-button-window-stats' style='display:inline-flex;'>
      </div>
      <div id='basic-view'>
-               <div id="inputzone">
+        <div id="inputzone">
             <div id="dropzone">
-				&nbsp;
-                <div class='min-button' style='text-align:right;'>
-                  <button style='box-shadow:none;' onclick='minInputZone()'><i class="fa fa-minus-square" aria-hidden="true"></i> Minimize</button>
-                </div>
+				<form>
+					Upload type:
+					<input type="radio" name="action" id="standardOption" onclick='switchtoStandard()'><label for="standardOption">Standard</label>
+					<input type="radio" name="action" id="riseOption" onclick='switchtoRISE()'><label for="riseOption">RISE</label>
+				</form>
+                <button style='box-shadow:none; float:right;' onclick='minInputZone()'><i class="fa fa-minus-square" aria-hidden="true"></i></button>
                <div style="text-align: left; margin-left:10px;color:#aaa"><br><b>Input files</b> - Drag and drop or click to browse:<br></div>
-
+		<div id="Standard">
             <div class="dz" id="maFile">
                   <br>Model <br>(.ma)
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="ma-file" multiple />
@@ -79,12 +81,35 @@
                   <input onchange="inp.processDroppedFiles(this)" type="file" id="pal-file" multiple />
                   <div class='statBox'></div>
                </div>
-
-               <br><br>
+			                  
+			   <br><br>
                &emsp;
                <button onclick="grid.loadSimulation()" id="BtnParseY">Load Simulation</button>
                <button style='background-color:green;' onclick="grid.loadTestSimulation()" id="BtnParseY">Load Test Files (in progress)</button>
                <br><br>
+			   
+		</div>
+		
+		<div id="RISE" hidden>
+			<div class="dz" id="zipFile">
+				<br>Zipfile (.zip)
+				<input onchange="grid.loadRISEzip(this)" type="file" id="zip-file" accept=".zip"/>
+				<div class='statBox'></div>
+			</div>
+			<div class="dz" id="xmlFile">
+				<br> XML file (.xml)
+				<input onchange="grid.loadRISExml(this)" type="file" id="xml-file"accept="text/xml"/>
+				<div class='statBox'></div>
+			</div>
+						   
+			<br><br>
+            &emsp;
+			<button id="uploadRise">Simulate on RISE</button>
+			<button id="Simulate" disabled>Run Simulation</button>
+			<br><br>
+		</div>
+
+
             </div>
 
                   <div id="LayersDiv" style='display:none;'>
@@ -219,6 +244,7 @@
    <script src="src/model.js"></script>
    <script src="src/charting.js"></script>
    <script src="src/recording.js"></script>
+   <script src="references/jszip.js"></script>
 
    <footer>
       <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> |
