@@ -956,7 +956,7 @@ function selectCell(event) {
 	ctx.lineWidth = 5;
 	if (grid.SelectedCells.length == 0) {
 		grid.SelectedCells.push(new cell(cellX, cellY, layer));
-		ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL-3, SCL-3);
+		ctx.strokeRect((ctx.lineWidth/2)+SCL*cellX, (ctx.lineWidth/2)+cellY*SCL, SCL-ctx.lineWidth, SCL-ctx.lineWidth);
 	}
 	else {
 		var found = false;
@@ -969,7 +969,7 @@ function selectCell(event) {
 		}
 		if (!found) {
 			grid.SelectedCells.push(new cell(cellX, cellY, layer));
-			ctx.strokeRect(0+SCL*cellX, 0+cellY*SCL, SCL-3, SCL-3);
+			ctx.strokeRect((ctx.lineWidth/2)+SCL*cellX, (ctx.lineWidth/2)+cellY*SCL, SCL-ctx.lineWidth, SCL-ctx.lineWidth);
 		}
 	}
 	grab('StatsOverlay').style.display = "none";
@@ -986,7 +986,7 @@ function drawOutline() {
 	ctx.lineWidth = 5;
 	for (var i=grid.SelectedCells.length-1; i>=0; i--) {
 		ctx.strokeStyle = grab('gridOverlayColor').value || 'rgb(120,120,130)';
-		ctx.strokeRect(0+SCL*grid.SelectedCells[i].x, 0+grid.SelectedCells[i].y*SCL, SCL-3, SCL-3);
+		ctx.strokeRect((ctx.lineWidth/2)+SCL*grid.SelectedCells[i].x, (ctx.lineWidth/2)+grid.SelectedCells[i].y*SCL, SCL-ctx.lineWidth, SCL-ctx.lineWidth);
 	}
 }
 
