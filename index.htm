@@ -91,20 +91,20 @@
 		</div>
 		
 		<div id="RISE" hidden>
-			<div class="dz" id="zipFile">
-				<br>Zipfile (.zip)
-				<input onchange="grid.loadRISEzip(this)" type="file" id="zip-file" accept=".zip"/>
-				<div class='statBox'></div>
-			</div>
 			<div class="dz" id="xmlFile">
 				<br> XML file (.xml)
 				<input onchange="grid.loadRISExml(this)" type="file" id="xml-file"accept="text/xml"/>
 				<div class='statBox'></div>
 			</div>
+			<div class="dz" id="zipFile">
+				<br>Zipfile (.zip)
+				<input onchange="grid.loadRISEzip(this)" type="file" id="zip-file" accept=".zip"/>
+				<div class='statBox'></div>
+			</div>
 						   
 			<br><br>
             &emsp;
-			<button id="uploadRise">Simulate on RISE</button>
+			<button id="uploadRise" onclick="startSimulate()">Simulate on RISE</button>
 			<button id="Simulate" disabled>Run Simulation</button>
 			<br><br>
 		</div>

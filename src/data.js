@@ -167,26 +167,38 @@ function switchtoRISE() {
 	standard.style.display='none';
 	RISE.style.display='block';	
 }
+
+var model_name;
 grid.loadRISExml = function(f) {
 	var file = f.files[0];
 	var filename = file.name;
-	if (filename.split('.').pop() == 'xml') {
-		//process xml file, upload to server
-		grid.simulateRise(file);
+	model_name = file.name.split('.').slice(0, -1).join('.');
+	url = "http://vs1.sce.carleton.ca:8080/cdpp/sim/workspaces/test/dcdpp/" + model_name;
 		
-	}
+	var fr = new FileReader();
+	fr.readAsText(file,"UTF-8");
+		
+	var x = new XMLHttpRequest();
+	x.open("PUT",url, true);
+	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
+	x.setRequestHeader('Content-type','text/xml');
+	x.send(fr.result);
+	
+	var box_xml = document.getElementById("xml-file").parentNode.children[2];
+	box_xml.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
 }
 
 grid.loadRISEzip = function(f) {
 	var file = f.files[0];
 	var filename = file.name;
+	model_name = file.name.split('.').slice(0, -1).join('.');
 	if (filename.split('.').pop() == 'zip') {
-	JSZip.loadAsync(file).then(function (f) {
-		Object.keys(f.files).forEach(function (filename) {
-			f.files[filename].async('string').then(function (fileData) {
+		JSZip.loadAsync(file).then(function (f) {
+			Object.keys(f.files).forEach(function (filename) {
+				f.files[filename].async('string').then(function (fileData) {
 					filename_ext = filename.split('.').pop();
-					var box = document.getElementById(filename_ext + "-file").parentNode.children[3];
 					if (filename_ext == "ma") {
+						var box = document.getElementById(filename_ext + "-file").parentNode.children[3];
 						var model_file = new File([fileData], filename, {
 							type: "text/plain",
 						});
@@ -196,6 +208,7 @@ grid.loadRISEzip = function(f) {
 					}
 					else if (filename_ext == "val") {
 						//value file
+						var box = document.getElementById(filename_ext + "-file").parentNode.children[3];
 						var value_file = new File([fileData], filename, {
 							type: "text/plain",
 						});
@@ -203,6 +216,7 @@ grid.loadRISEzip = function(f) {
 					}
 					else if (filename_ext == "pal") {
 						//pallete file
+						var box = document.getElementById(filename_ext + "-file").parentNode.children[3];
 						var pallete_file = new File([fileData], filename, {
 							type: "text/plain",
 						});
@@ -212,5 +226,64 @@ grid.loadRISEzip = function(f) {
 			})
 		})
     }
-}
 	
+	
+	var url = "http://vs1.sce.carleton.ca:8080/cdpp/sim/workspaces/test/dcdpp/" + model_name+ "?zdir=" + model_name;
+
+	var fr = new FileReader();
+	fr.readAsArrayBuffer(file);
+	
+	var x = new XMLHttpRequest();
+	x.open("POST",url, true);
+	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
+	x.overrideMimeType("application/octet-stream");
+	x.setRequestHeader('Content-type','application/zip');
+	x.send(fr.result);
+	
+	var box_zip = document.getElementById("zip-file").parentNode.children[2];
+	box_zip.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
+}
+
+function startSimulate() {
+	url = "http://vs1.sce.carleton.ca:8080/cdpp/sim/workspaces/test/dcdpp/" + model_name + "/simulation";
+	
+	var x = new XMLHttpRequest();
+	
+	
+	x.open("PUT",url,true);
+	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
+	x.send("START_SIMULATION");
+	setTimeout(getSimulationLog,5000);
+}
+
+function getSimulationLog() {
+	url = "http://vs1.sce.carleton.ca:8080/cdpp/sim/workspaces/test/dcdpp/" + model_name + "/results";
+	
+	var x = new XMLHttpRequest();
+	x.open("GET", url, true);
+	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
+	x.responseType = "blob";
+	x.onload = function() {
+		blob = x.response;
+		file = new File([blob],"log.zip");
+		
+		JSZip.loadAsync(file).then(function (f) {
+			Object.keys(f.files).forEach(function (filename) {
+				f.files[filename].async('string').then(function (fileData) {
+					filename_ext = filename.split('.').pop();
+					if (filename_ext == "log") {
+						var log_file = new File([fileData], filename, {
+							type: "text/plain",
+						});
+						inp.logFile = log_file;
+						inp.logLoaded = true;
+						var box = document.getElementById("log-file").parentNode.children[3];
+						box.innerHTML = file.name+'<font color=#f7c933><br><b>Ready to parse</b></font>';
+					}
+				})
+			})
+		})
+	}
+	x.send();
+}
+
