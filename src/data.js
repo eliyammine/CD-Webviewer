@@ -182,10 +182,20 @@ grid.loadRISExml = function(f) {
 	x.open("PUT",url, true);
 	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
 	x.setRequestHeader('Content-type','text/xml');
-	x.send(fr.result);
 	
-	var box_xml = document.getElementById("xml-file").parentNode.children[2];
-	box_xml.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
+	x.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 202) {
+			var box_xml = document.getElementById("xml-file").parentNode.children[2];
+			box_xml.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
+		}
+		else {
+			var box_xml = document.getElementById("xml-file").parentNode.children[2];
+			box_xml.innerHTML = "'<font color=red>Failed to Upload, Try Again.";
+		}
+	}
+	
+	
+	x.send(fr.result);
 }
 
 grid.loadRISEzip = function(f) {
@@ -238,10 +248,19 @@ grid.loadRISEzip = function(f) {
 	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
 	x.overrideMimeType("application/octet-stream");
 	x.setRequestHeader('Content-type','application/zip');
-	x.send(fr.result);
 	
-	var box_zip = document.getElementById("zip-file").parentNode.children[2];
-	box_zip.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
+	
+	x.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 202) {
+			var box_zip = document.getElementById("zip-file").parentNode.children[2];
+			box_zip.innerHTML = file.name + '<font color=green><br><b>Loaded!!</b></font>'; 
+		}
+		else {
+			var box_zip = document.getElementById("zip-file").parentNode.children[2];
+			box_zip.innerHTML = "'<font color=red>Failed to Upload. Try Again";
+		}
+	}
+	x.send(fr.result);
 }
 
 function startSimulate() {
@@ -252,8 +271,21 @@ function startSimulate() {
 	
 	x.open("PUT",url,true);
 	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
+	grab('Simulate').innerHTML = "Simulation Pending";
+	grab('Simulate').style.background = '#f7c933';
+	x.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 202) {
+			getSimulationLog();
+			grab('Simulate').innerHTML = "Simulation Complete. Run Simulation";
+			grab('Simulate').style.background = 'green';
+			grab('Simulate').disabled = false;
+			grab('Simulate').onclick=function() { 
+				grid.loadSimulation() 
+				switchtoStandard();
+			};
+		}
+	}
 	x.send("START_SIMULATION");
-	setTimeout(getSimulationLog,5000);
 }
 
 function getSimulationLog() {
@@ -263,6 +295,18 @@ function getSimulationLog() {
 	x.open("GET", url, true);
 	x.setRequestHeader("Authorization", "Basic " + btoa("test:test"));
 	x.responseType = "blob";
+	
+	x.onreadystatechange = function() {
+		if (this.readyState == 4 && this.status == 202) {
+
+		}
+		else {
+			var box = document.getElementById("log-file").parentNode.children[3];
+			box.innerHTML = "'<font color=red>Failed to Download.";
+		}
+	}
+	
+	
 	x.onload = function() {
 		blob = x.response;
 		file = new File([blob],"log.zip");
