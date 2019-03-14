@@ -20,6 +20,9 @@ stats = {};
 charts = {};
 charts.states = null;
 charts.transitions = null;
+charts.cellsStatesDialog =  null;
+charts.statesDialog =  null;
+charts.transitionDialog = null;
 
 /** Global grid object {model, view, data} \*/
 //model
@@ -104,6 +107,25 @@ function closeLineDialog(){
 	//lineBox.innerHTML = '';
 	var lineDialog = grab('lineGraphDialog');
 	lineDialog.close();
+}
+function closeCellsStateDialog(){
+	//ar lineBox = grab('lineBox');
+	//lineBox.innerHTML = '';
+	var cellsStateDialog = grab('cellsStateDialog');
+	cellsStateDialog.close();
+}
+function closeStateFreqDialog(){
+	//ar lineBox = grab('lineBox');
+	//lineBox.innerHTML = '';
+	var stateFreqDialog = grab('stateFreqDialog');
+	stateFreqDialog.close();
+}
+
+function closeTransitionDialog(){
+	//ar lineBox = grab('lineBox');
+	//lineBox.innerHTML = '';
+	var transitionDialog = grab('transitionDialog');
+	transitionDialog.close();
 }
 
 
@@ -662,36 +684,38 @@ grid.toggleCharts = function(z, port) {
 	
 	charts.cellsState = Viz.charting.BuildCellsStateChart(grab('chartsDiv'), "cellsState", [50, 50, 50, 50]);
 	
+	//Configuring charts for dialog box
+	var lineDialog = grab('cellsStateDialog');
+	lineDialog.showModal();
+	charts.cellsStatesDialog = Viz.charting.BuildCellsStateChart(grab('graphBox'), "dialogCellsState", [50, 50, 50, 50]);
+	lineDialog.close()
+	
+	//Configuring charts for state frequency dialog box
+	var stateFreqDialog = grab('stateFreqDialog');
+	stateFreqDialog.showModal();
+	charts.statesDialog = Viz.charting.BuildStatesChart(grab('stateFreqBox'), "dialogStateFreq", [70, 40, 20, 50]);  
+	stateFreqDialog.close()
+	
+	//Configuring charts for the Transitions dialog box
+	var transitionDialog = grab('transitionDialog');
+	transitionDialog.showModal();
+	charts.transitionDialog = Viz.charting.BuildTransitionsChart(grab('transitionBox'), "dialogTransition", [50, 50, 50, 50]);
+	transitionDialog.close()
+	
 	grid.updateGridView();
 }
 
 grid.updateCharts = function(t, fb,selected) {
-	/*
-	fbSel = [[[]]]
-	if (grid.SelectedCells.length == 0) {
-		Viz.data.UpdateTime(t, fb);
-	}
-	else {
-		var array = grid.SelectedCells;
-		for (var i in array) {
-			fbSel[0][0][i]=fb[array[i].z][array[i].y][array[i].x];
-		}
-		Viz.data.UpdateTime(t, fb, fbSel);
-	}
-
-	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
-	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
-	//if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
-	
-	charts.cellsState.Update(Viz.data.CellsStateAsArray(selected));
-	
-	*/
 	Viz.data.UpdateTime(t, fb, selected);
 
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
+	charts.statesDialog.Update(Viz.data.StatesAsArray());
+	
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
-
+    charts.transitionDialog.Update(Viz.data.TransitionAsArray());
+	
 	charts.cellsState.Update(Viz.data.CellsStateAsArray(selected));
+	charts.cellsStatesDialog.Update(Viz.data.CellsStateAsArray(canvas.selected));
 	
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
 }
@@ -768,6 +792,56 @@ function maxCanvasZone(){
 	grab('min-button-window-canvas').innerHTML = '';
 }
 
+function minimizeStateFreqChart(){
+	grab('statechart-div').style.display = 'none';
+	grab('btn-max-stateFreqState').style.display = 'none';	
+	grab('btn-statefreq').style.display = 'none';
+	grab('min-button-window-statesChart').innerHTML += '<button onclick="maxStateFreqChart()">State Frequency Chart</button>'
+	
+	if(grab('activitychart-div').style.display == "none"  && grab('cellschart-div').style.display == "none" )
+		grab('chartsDiv').style.display = 'none';
+}
+function minimizeCellStateChart(){
+	grab('cellschart-div').style.display = 'none';	
+	grab('btn-max-cellsState').style.display = 'none';
+	grab('btn-min-cellsState').style.display = 'none';
+	grab('min-button-window-cellsChart').innerHTML += '<button onclick="maxCellStateChart()">Cells State Chart</button>'
+	
+	if(grab('activitychart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
+		grab('chartsDiv').style.display = 'none';
+}
+function minimizeTransitionChart(){
+	grab('activitychart-div').style.display = 'none';
+	grab('btn-activity').style.display = 'none';
+	grab('btn-max-transition').style.display = 'none';
+	grab('min-button-window-transitionChart').innerHTML += '<button onclick="maxTransitionChart()">Transition Chart</button>';
+	
+	if(grab('cellschart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
+		grab('chartsDiv').style.display = 'none';
+}
+
+function maxStateFreqChart(){
+	grab('chartsDiv').style.display = 'inline-table';
+	grab('statechart-div').style.display = 'block';
+	grab('btn-max-stateFreqState').style.display = 'inline';	
+	grab('btn-statefreq').style.display = 'inline';
+	grab('min-button-window-statesChart').innerHTML = '';
+}
+
+function maxCellStateChart(){
+	grab('chartsDiv').style.display = 'inline-table';
+	grab('cellschart-div').style.display = 'block';
+	grab('btn-max-cellsState').style.display = 'inline';
+	grab('btn-min-cellsState').style.display = 'inline';
+	grab('min-button-window-cellsChart').innerHTML = '';
+}
+function maxTransitionChart(){
+	grab('chartsDiv').style.display = 'inline-table';
+	grab('activitychart-div').style.display = 'block';
+	grab('btn-max-transition').style.display = 'inline';
+	grab('btn-activity').style.display = 'inline';
+	grab('min-button-window-transitionChart').innerHTML = '';
+}
 
 function getCellValue (mousePos) {
 		var portID = 0;
@@ -1119,4 +1193,44 @@ function showStats(){
         stat[0].style.display = 'none';
 		
    }
+}
+
+
+function maximizeCellsState(){
+    var lineDialog = grab('cellsStateDialog');
+	lineDialog.showModal();
+	var canvas = grid.view.canvy;
+	var pos = canvas.getBoundingClientRect();	
+    var div = d3.select("#cellsStateDialog");	
+	//div.attr('width',600);
+	div.attr('left',pos.left + 200);
+	div.attr('top',pos.top - 200);	
+	
+	//charts.cellsStatesDialog = Viz.charting.BuildCellsStateChart(grab('graphBox'), "cellsState", [50, 50, 50, 50]);
+	//charts.cellsStatesDialog.Update(Viz.data.CellsStateAsArray(canvas.selected));
+}
+
+function maximizeStateFreqDialog(){
+    var stateFreqDialog = grab('stateFreqDialog');
+	stateFreqDialog.showModal();
+	var canvas = grid.view.canvy;
+	var pos = canvas.getBoundingClientRect();	
+    var div = d3.select("#stateFreqDialog");	
+	//div.attr('width',600);
+	div.attr('left',pos.left + 200);
+	div.attr('top',pos.top - 200);	
+
+}
+
+
+function maximizeTransitionDialog(){
+    var transitionDialog = grab('transitionDialog');
+	transitionDialog.showModal();
+	var canvas = grid.view.canvy;
+	var pos = canvas.getBoundingClientRect();	
+    var div = d3.select("#transitionDialog");	
+	//div.attr('width',600);
+	div.attr('left',pos.left + 200);
+	div.attr('top',pos.top - 200);	
+
 }

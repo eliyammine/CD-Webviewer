@@ -47,6 +47,13 @@
      </div>
       <div id='min-button-window-stats' style='display:inline-flex;'>
      </div>
+	 
+	 <div id='min-button-window-statesChart' style='display:inline-flex;'>
+	</div>
+	<div id='min-button-window-cellsChart' style='display:inline-flex;'>
+	</div>
+	<div id='min-button-window-transitionChart' style='display:inline-flex;'>
+</div>
      <div id='basic-view'>
         <div id="inputzone">
             <div id="dropzone">
@@ -232,6 +239,46 @@
           </div>	
         <footer>
           <button onclick='closeLineDialog();' type='reset'>Close</button>
+        </footer>
+    </dialog>
+	
+		   	 <dialog id="cellsStateDialog">
+    <style>
+      .line-chart
+      {
+          border: 1px solid lightgray;
+      }
+    </style>
+		<div id='graphBox' class="dialog-container">
+          </div>	
+        <footer>
+          <button onclick='closeCellsStateDialog();' type='reset'>Close</button>
+        </footer>
+    </dialog>
+   <dialog id="stateFreqDialog">
+    <style>
+      .line-chart
+      {
+          border: 1px solid lightgray;
+      }
+    </style>
+		<div id='stateFreqBox' class="dialog-container">
+          </div>	
+        <footer>
+          <button onclick='closeStateFreqDialog();' type='reset'>Close</button>
+        </footer>
+    </dialog>
+   <dialog id="transitionDialog">
+    <style>
+      .line-chart
+      {
+          border: 1px solid lightgray;
+      }
+    </style>
+		<div id='transitionBox' >
+          </div>	
+        <footer>
+          <button onclick='closeTransitionDialog();' type='reset'>Close</button>
         </footer>
     </dialog>
 	

@@ -38,6 +38,7 @@ Viz.data = {
 		this.track = track;	
 		this.cellsStates = [];
 		this.UpdateTime(0);
+		this.rbgColors =[];
 		
 		var maxT = grid.model.data.length - 1;
 		
@@ -51,6 +52,9 @@ Viz.data = {
 			median : d3.median(transitions, function(d) { return d.value; }),
 			stddev : Math.sqrt(d3.variance(transitions, function(d) { return d.value; }))
 		}
+		for(var i = 0; i < 20; i++)
+			this.rbgColors.push("hsl(" + (((Math.random() * 1000) + (Math.random()*360)+ (Math.random()*500))%360 )+ ",100%,50%)");
+			//this.rbgColors.push(Math.floor(((Math.random() * 255) + (Math.random() * 255)) % 255));
 		
 		this.UpdateTime(0);
 	},
@@ -221,14 +225,14 @@ Viz.charting = {
 			
 			 //var color = d3.scale.category20();
 	
-			
+			// .attr("stroke", function(d,i){return "hsl(" + (((Math.random() * 1000) + (Math.random()*360)+ (Math.random()*500))%360 )+ ",100%,50%)";})
 			
 			var enter = chart.g.selectAll(".line")
 							   .data(data, function(d, i) { return data[i].id; })
 							   .enter().append("path")
 							   .attr("class", "line")
 							   .attr("fill", "none")
-							   .attr("stroke", function(d,i){return "hsl(" + (((Math.random() * 1000) + (Math.random()*360)+ (Math.random()*500))%360 )+ ",100%,50%)";})
+							   .attr("stroke", function(d,i){return Viz.data.rbgColors[i%20];})
 							   .attr("stroke-linejoin", "round")
 							   .attr("stroke-linecap", "round")
 							   .attr("data-legend","legend")
@@ -250,7 +254,7 @@ Viz.charting = {
 					.data(colorScheme, function(d, i) { return colorScheme[i].id; })
 					.enter().append("g").append("text")
 					.attr("class","lgd")
-					.attr("x", 290)  // space legend
+					.attr("x", chart.size.w)  // space legend
 					.attr("y", function(d, i) { return w-=15;})
 					.attr("class", "legend") 
 					.style("fill", function(d, i) { // Add the colours dynamically
@@ -491,20 +495,160 @@ Viz.charting = {
 	},
 	
 	BuildChart : function(pNode, type, margin) {
-		var classes = ["chart-container"];
+		var classes = ["chart-container","dialog-container"];
+		var uid="blank";
 		
 		if (type) classes.push(type);
 		
 		if (type === 'state'){
-			d3.select(pNode).append('br');
-			var button = d3.select(pNode).append("button")
-									 .attr('id', 'ruby')
+			
+			uid="statechart-div";
+
+			
+							 
+			d3.select(pNode).append('br');	
+			
+			var chartheader = d3.select(pNode).append("div")
+											  .attr('display', 'inline')
+											  .style('float', 'left')
+											  .style('text-align', 'left')
+											  .style('width', '50%');
+											  
+			var chartheader2 = d3.select(pNode).append("div")
+											 .attr('display', 'inline')
+											 .style('float', 'right')
+											  .style('text-align', 'right')
+											  .style('width', '50%');
+			
+			var button = chartheader.append("button")
+									 .attr('id', 'btn-max-stateFreqState')
+									 .attr('float', 'left')
 									 .style('text-align', 'right')
-									 .text('Minimize')
-									 .attr('onclick', 'minStatsZone()');
+									 .attr('display', 'block')
+									 .attr('onclick', 'maximizeStateFreqDialog()')
+									 .append("i")
+									 .attr("class","fa fa-plus-square")
+									 .attr("aria-hidden","true");		
+
+			 // .attr('float','right')
+			
+			/*var button = chartheader2.append("button")
+									 .style('box-shadow','none')
+									 .attr('id', 'btn-min-stateFreqState')
+									 .style('text-align', 'right')									
+									 .attr('onclick', 'minimizeStateFreqChart()')
+									 .append("i")
+									 .attr("class","fa fa-minus-square")
+									 .attr("aria-hidden","true");*/
+			var button = chartheader2.append("button")
+									 .style('box-shadow','none')	
+									 .attr('id', 'btn-statefreq')
+									 .style('text-align', 'right')
+									 .attr('float','right')
+									 .attr('onclick', 'minimizeStateFreqChart()')
+									 .append("i")
+									 .attr("class","fa fa-minus-square")
+									 .attr("aria-hidden","true");									
+			d3.select(pNode).append('br')
+									.style('clear', 'both');									 
+		
+									 
+		}else if (type === 'cellsState'){
+
+			uid = "cellschart-div";
+			
+			d3.select(pNode).append('br');
+			
+			var chartheader = d3.select(pNode).append("div")
+											  .attr('display', 'inline')
+											  .style('float', 'left')
+											  .style('text-align', 'left')
+											  .style('width', '50%');
+											  
+			var chartheader2 = d3.select(pNode).append("div")
+											 .attr('display', 'inline')
+											 .style('float', 'right')
+											  .style('text-align', 'right')
+											  .style('width', '50%');
+			
+			var button = chartheader.append("button")
+									 .attr('id', 'btn-max-cellsState')
+									 .attr('float', 'left')
+									 .style('text-align', 'right')
+									 .attr('display', 'block')
+									 .attr('onclick', 'maximizeCellsState()')
+									 .append("i")
+									 .attr("class","fa fa-plus-square")
+									 .attr("aria-hidden","true");		
+
+			 // .attr('float','right')
+			
+			var button = chartheader2.append("button")
+									 .style('box-shadow','none')
+									 .attr('id', 'btn-min-cellsState')
+									 .style('text-align', 'right')									
+									 .attr('onclick', 'minimizeCellStateChart()')
+									 .append("i")
+									 .attr("class","fa fa-minus-square")
+									 .attr("aria-hidden","true");
+									
+			d3.select(pNode).append('br')
+									.style('clear', 'both');
+									
+		}else if (type === 'activity'){
+			uid= "activitychart-div";
+			d3.select(pNode).append('br');
+			
+			var chartheader = d3.select(pNode).append("div")
+											  .attr('display', 'inline')
+											  .style('float', 'left')
+											  .style('text-align', 'left')
+											  .style('width', '50%');
+											  
+			var chartheader2 = d3.select(pNode).append("div")
+											 .attr('display', 'inline')
+											 .style('float', 'right')
+											  .style('text-align', 'right')
+											  .style('width', '50%');
+			
+			var button = chartheader.append("button")
+									 .attr('id', 'btn-max-transition')
+									 .attr('float', 'left')
+									 .style('text-align', 'right')
+									 .attr('display', 'block')
+									 .attr('onclick', 'maximizeTransitionDialog()')
+									 .append("i")
+									 .attr("class","fa fa-plus-square")
+									 .attr("aria-hidden","true");		
+
+ 
+
+			var button = chartheader2.append("button")
+									 .style('box-shadow','none')
+									 .attr('id', 'btn-activity')
+									 .style('text-align', 'left')
+									 .attr('float','left')
+									 .attr('onclick', 'minimizeTransitionChart()')
+									 .append("i")
+									 .attr("class","fa fa-minus-square")
+									 .attr("aria-hidden","true");								
+			d3.select(pNode).append('br')
+									.style('clear', 'both');	
+
+									 
+
+		
+		}else if (type === 'dialogTransition'){
+			//classes = ["chart-container"];
+		
 		}
 		
+		
+		
 		var div = d3.select(pNode).append("div").attr("class", classes.join(" "));
+		
+		//adding an id
+		div = div.attr("id", uid);
 		var div = div.append("div").attr("class", "chart");
 		
 		var chart = {

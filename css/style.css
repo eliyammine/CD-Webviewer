@@ -258,9 +258,28 @@ label{
 	height : 280px;
 }
 
+.dialog-container{
+  height : 480px;
+}
+
 .chart-container.cellsState { 
 	height : 480px;
 }
+
+
+.chart-container.dialogStateFreq { 
+	height : 480px;
+	width: 738px;
+}
+
+.chart-container.dialogTransition { 
+	height : 600px;
+	width: 600px;
+}
+.chart-container.dialogCellsState { 
+	height : 480px;
+}
+
 
 .chart-container.activity {
 	height : auto;
@@ -689,7 +708,27 @@ input:checked + .slider:before {
 
 #lineGraphDialog{
 	position:absolute;
-	width:400px;
+	width:420px;
+	
+}
+#stateFreqDialog{
+	position:absolute;
+	height : 550px;
+	width: 738px;
+	background-color: #2a2a31;
+}
+
+#cellsStateDialog{
+	position:absolute;
+	width:756px;
+	background-color: #2a2a31;
+}
+
+#transitionDialog{
+	position:absolute;
+	width:600px;
+	height : 670px;
+	background-color: #2a2a31;
 }
 
 
