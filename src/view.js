@@ -102,6 +102,11 @@ grid.loadSimulation = function(){
 	d3.selectAll("#paletteDiv").remove();
 }
 
+//For demo load
+grab("BtnParseY2").addEventListener("click", function(){
+  demo.loadLocal("\demo\TIS_test.pal");
+});
+
 function closeLineDialog(){
 	var lineBox = grab('lineBox');
 	//lineBox.innerHTML = '';
@@ -681,27 +686,27 @@ grid.toggleCharts = function(z, port) {
 	if(grab('showStateFreq').checked) charts.states = Viz.charting.BuildStatesChart(grab('chartsDiv'), "state", [70, 40, 20, 50]);
 	if(grab('showTransitions').checked) charts.transitions = Viz.charting.BuildTransitionsChart(grab('chartsDiv'), "activity", [50, 50, 50, 50]);
 	if(grab('showStats').checked) stats = Viz.stats.Build(grab('chartsDiv'), Viz.data);
-	
+
 	charts.cellsState = Viz.charting.BuildCellsStateChart(grab('chartsDiv'), "cellsState", [50, 50, 50, 50]);
-	
+
 	//Configuring charts for dialog box
 	var lineDialog = grab('cellsStateDialog');
 	lineDialog.showModal();
 	charts.cellsStatesDialog = Viz.charting.BuildCellsStateChart(grab('graphBox'), "dialogCellsState", [50, 50, 50, 50]);
 	lineDialog.close()
-	
+
 	//Configuring charts for state frequency dialog box
 	var stateFreqDialog = grab('stateFreqDialog');
 	stateFreqDialog.showModal();
-	charts.statesDialog = Viz.charting.BuildStatesChart(grab('stateFreqBox'), "dialogStateFreq", [70, 40, 20, 50]);  
+	charts.statesDialog = Viz.charting.BuildStatesChart(grab('stateFreqBox'), "dialogStateFreq", [70, 40, 20, 50]);
 	stateFreqDialog.close()
-	
+
 	//Configuring charts for the Transitions dialog box
 	var transitionDialog = grab('transitionDialog');
 	transitionDialog.showModal();
 	charts.transitionDialog = Viz.charting.BuildTransitionsChart(grab('transitionBox'), "dialogTransition", [50, 50, 50, 50]);
 	transitionDialog.close()
-	
+
 	grid.updateGridView();
 }
 
@@ -710,13 +715,13 @@ grid.updateCharts = function(t, fb,selected) {
 
 	if(grab('showStateFreq').checked) charts.states.Update(Viz.data.StatesAsArray());
 	charts.statesDialog.Update(Viz.data.StatesAsArray());
-	
+
 	if(grab('showTransitions').checked) charts.transitions.Update(Viz.data.TransitionAsArray());
     charts.transitionDialog.Update(Viz.data.TransitionAsArray());
-	
+
 	charts.cellsState.Update(Viz.data.CellsStateAsArray(selected));
 	charts.cellsStatesDialog.Update(Viz.data.CellsStateAsArray(canvas.selected));
-	
+
 	if(grab('showStats').checked) stats.Update(Viz.data.t, Viz.data.states);
 }
 function getMousePos(canvas, event) {
@@ -794,19 +799,19 @@ function maxCanvasZone(){
 
 function minimizeStateFreqChart(){
 	grab('statechart-div').style.display = 'none';
-	grab('btn-max-stateFreqState').style.display = 'none';	
+	grab('btn-max-stateFreqState').style.display = 'none';
 	grab('btn-statefreq').style.display = 'none';
 	grab('min-button-window-statesChart').innerHTML += '<button onclick="maxStateFreqChart()">State Frequency Chart</button>'
-	
+
 	if(grab('activitychart-div').style.display == "none"  && grab('cellschart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
 }
 function minimizeCellStateChart(){
-	grab('cellschart-div').style.display = 'none';	
+	grab('cellschart-div').style.display = 'none';
 	grab('btn-max-cellsState').style.display = 'none';
 	grab('btn-min-cellsState').style.display = 'none';
 	grab('min-button-window-cellsChart').innerHTML += '<button onclick="maxCellStateChart()">Cells State Chart</button>'
-	
+
 	if(grab('activitychart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
 }
@@ -815,7 +820,7 @@ function minimizeTransitionChart(){
 	grab('btn-activity').style.display = 'none';
 	grab('btn-max-transition').style.display = 'none';
 	grab('min-button-window-transitionChart').innerHTML += '<button onclick="maxTransitionChart()">Transition Chart</button>';
-	
+
 	if(grab('cellschart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
 }
@@ -823,7 +828,7 @@ function minimizeTransitionChart(){
 function maxStateFreqChart(){
 	grab('chartsDiv').style.display = 'inline-table';
 	grab('statechart-div').style.display = 'block';
-	grab('btn-max-stateFreqState').style.display = 'inline';	
+	grab('btn-max-stateFreqState').style.display = 'inline';
 	grab('btn-statefreq').style.display = 'inline';
 	grab('min-button-window-statesChart').innerHTML = '';
 }
@@ -908,30 +913,30 @@ function showZoom(event) {
 	}
 }
 
-canvas.addEventListener('click', function(event){	
+canvas.addEventListener('click', function(event){
 		var mousePos = getMousePos(canvas, event);
-		
+
 		var portID = 0;
 		var layer =0;
 		var fb = grid.view.viewBuffer;
-		
+
 		var height = canvy.height / grid.model.dimY;
 		var width = canvy.width / grid.model.dimX;
 
 		var cellX = Math.round((mousePos.x-20)/width);
 		var cellY = Math.round((mousePos.y-18)/height);
 		var cellZ = portID;
-		
+
 		this.selected.push({x:cellX, y:cellY, z:cellZ});
 		selectCell(event);
 		return;
-		
+
 		if ((cellY> grid.model.dimY-1) && (grid.model.ports.length > 0)) {
 			cellY=Math.round((mousePos.y+15)/height);
 			cellY=cellY - grid.model.dimY -1;
 			layer++;
 		}
-		
+
 		if (cellY > grid.model.dimY-1) cellY=grid.model.dimY-1;
 		if (cellX > grid.model.dimX-1) cellX=grid.model.dimX-1;
 		if (cellX == -1) cellX =0;
@@ -971,7 +976,7 @@ canvas.addEventListener('click', function(event){
 
    		var svg = d3.select('#line-graph').attr("width", svgWidth).attr("height", svgHeight);
    		var g = svg.append("g")
-				   .attr("transform", 
+				   .attr("transform",
 				      "translate(" + margin.left + "," + margin.top + ")"
 				   );
 
@@ -1012,11 +1017,11 @@ canvas.addEventListener('click', function(event){
 		g.append("text")
             .attr("text-anchor", "middle")  // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate("+ (width/2) +","+(height-(50/3))+")")  // centre below axis
-            .text("Timeline (10 frames per unit)");		
+            .text("Timeline (10 frames per unit)");
 		var lineDialog = grab('lineGraphDialog');
 		lineDialog.showModal();
-	
-	
+
+
 }, false);
 
 function selectCell(event) {
@@ -1172,26 +1177,26 @@ document.getElementById('basic-view-button').addEventListener('click', function(
         document.getElementById('advanced-view').style.display ='none';
        }
     });
-	
+
 function showStats(){
     var lineDialog = grab('lineGraphDialog');
 	lineDialog.showModal();
 	var canvas = grid.view.canvy;
-	var pos = canvas.getBoundingClientRect();	
-    var div = d3.select("#lineGraphDialog");	
+	var pos = canvas.getBoundingClientRect();
+    var div = d3.select("#lineGraphDialog");
 	//div.attr('width',600);
 	div.attr('left',pos.left + 200);
 	div.attr('top',pos.top - 200);
-	
-	
-	
-   var stat = document.getElementsByClassName('changeStats');	
+
+
+
+   var stat = document.getElementsByClassName('changeStats');
 	if(stat[0].style.display == '' || stat[0].style.display == 'none'){
-        stat[0].style.display = 'inline-block';		
+        stat[0].style.display = 'inline-block';
    }
-   else {	
+   else {
         stat[0].style.display = 'none';
-		
+
    }
 }
 
@@ -1200,12 +1205,12 @@ function maximizeCellsState(){
     var lineDialog = grab('cellsStateDialog');
 	lineDialog.showModal();
 	var canvas = grid.view.canvy;
-	var pos = canvas.getBoundingClientRect();	
-    var div = d3.select("#cellsStateDialog");	
+	var pos = canvas.getBoundingClientRect();
+    var div = d3.select("#cellsStateDialog");
 	//div.attr('width',600);
 	div.attr('left',pos.left + 200);
-	div.attr('top',pos.top - 200);	
-	
+	div.attr('top',pos.top - 200);
+
 	//charts.cellsStatesDialog = Viz.charting.BuildCellsStateChart(grab('graphBox'), "cellsState", [50, 50, 50, 50]);
 	//charts.cellsStatesDialog.Update(Viz.data.CellsStateAsArray(canvas.selected));
 }
@@ -1214,11 +1219,11 @@ function maximizeStateFreqDialog(){
     var stateFreqDialog = grab('stateFreqDialog');
 	stateFreqDialog.showModal();
 	var canvas = grid.view.canvy;
-	var pos = canvas.getBoundingClientRect();	
-    var div = d3.select("#stateFreqDialog");	
+	var pos = canvas.getBoundingClientRect();
+    var div = d3.select("#stateFreqDialog");
 	//div.attr('width',600);
 	div.attr('left',pos.left + 200);
-	div.attr('top',pos.top - 200);	
+	div.attr('top',pos.top - 200);
 
 }
 
@@ -1227,10 +1232,10 @@ function maximizeTransitionDialog(){
     var transitionDialog = grab('transitionDialog');
 	transitionDialog.showModal();
 	var canvas = grid.view.canvy;
-	var pos = canvas.getBoundingClientRect();	
-    var div = d3.select("#transitionDialog");	
+	var pos = canvas.getBoundingClientRect();
+    var div = d3.select("#transitionDialog");
 	//div.attr('width',600);
 	div.attr('left',pos.left + 200);
-	div.attr('top',pos.top - 200);	
+	div.attr('top',pos.top - 200);
 
 }
