@@ -24,7 +24,7 @@ charts.cellsStatesDialog =  null;
 charts.statesDialog =  null;
 charts.transitionDialog = null;
 
-/** Global grid object {model, view, data} \*/
+/** Global grid object {model, view, data} */
 //model
 grid.model = {};
 grid.model.name = 'CellDevsModel';	// Model Name (ID)
@@ -102,10 +102,6 @@ grid.loadSimulation = function(){
 	d3.selectAll("#paletteDiv").remove();
 }
 
-//For demo load
-grab("BtnParseY2").addEventListener("click", function(){
-  demo.loadLocal("\demo\TIS_test.pal");
-});
 
 function closeLineDialog(){
 	var lineBox = grab('lineBox');

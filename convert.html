@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+</head>
+
+<body>
+  <textarea rows="20" style="width:200px" placeholder="Insert the text for conversion" id="in_area"></textarea>
+  <textarea rows="20" style="width:200px" placeholder="There will be output to use" id="out_area" disabled></textarea>
+  <button onclick="convert()">Convert</button>
+</body>
+
+<script>
+  function convert(event) {
+    console.log("convert");
+    var intext = document.getElementById("in_area").value;
+    //replace " with ' to be sure not to break the result
+    var arr = intext.replace(/"/gi,"'").split("\n"), res=[];
+    arr.forEach(function(elem){res.push(elem +"\n");});
+    document.getElementById("out_area").value = JSON.stringify(res);
+  }
+</script>
