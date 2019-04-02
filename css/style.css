@@ -469,15 +469,20 @@ html[data-UA*='Mac OS'] #gridOverlayColor
 	border: dashed 2px #6b6b6b;
 	color:#666;
 	display: inline-block;
-	height: 100px;
+	height: 225px;
 	margin: 5px;
 	padding: 5px;
 	text-align: center;
 	vertical-align: top;
-	width: 100px;
+	width: 200px;
 	overflow: hidden;
 	position:relative;
 	z-index: 1;
+}
+img {
+	width: 95%;
+	height: 95%;
+	object-fit: contain;
 }
 #dropzone .dz input{
 	opacity:0;

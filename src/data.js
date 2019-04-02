@@ -88,7 +88,6 @@ inp.parseYChunks = function(){
 	// -----------------------
 	// Define variables and constants
 	var CHUNK_SIZE = inp.chunkSize;
-	var statBox = document.getElementById('log-file').parentNode.children[3]; // statBox div
 	var C = {					// Container for a single reader object
 		file: inp.logFile,		// File handle (e.g. file.size, file.slice(), etc.)
 		fileReader:'',			// FileReader handle (e.g. fileReader.readAsTest(), etc.)
@@ -127,7 +126,6 @@ inp.parseYChunks = function(){
 		// Check end of file
 		if(C.end > C.file.size || C.end > inp.MAXFILESIZE){	// TEST ONLY: limit to 6GB
 			grid.parseYMessages(C.chunkContent, safeEndIndex,true);		// signal lastChunk=true
-			statBox.innerHTML = C.file.name+'<font color = green><br><b>All parsed!</b></font>';
 			inp.logParsed = true;
 			grab('BtnParseY').style.background = '';
 			grab('BtnParseY').disabled = false;

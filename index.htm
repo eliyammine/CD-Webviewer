@@ -27,15 +27,15 @@
 			</h3>
 
             <h2>
-				<a style='color:red;' href="http://cell-devs.sce.carleton.ca/intranet/webviewer/" target="_blank">CellDEVS Simulation Viewer</a>
+				<a style='color:red; font-size:x-large' href="http://cell-devs.sce.carleton.ca/intranet/webviewer/" target="_blank">CellDEVS Simulation Viewer</a>
 			</h2>
 
             <span id='alphaTag'><b> alpha</b></span>
 
 			<span id="linksTag">
-				<a href="https://goo.gl/vhQE03" target="_blank">&#128304; tutorials</a> &emsp;
+			<!--	<a href="https://goo.gl/vhQE03" target="_blank">&#128304; tutorials</a> &emsp;
 				<a href="https://goo.gl/S7agHi" target="_blank">&#9733; samples</a> &emsp;
-				<a href="mailto:omar.hesham@carleton.ca?Subject=[CellDEVSViewer][alpha]" target="_blank">&#9749; report a problem </a>
+				<a href="mailto:omar.hesham@carleton.ca?Subject=[CellDEVSViewer][alpha]" target="_blank">&#9749; report a problem </a> -->
 			</span>
          </div>
       </div>
@@ -57,65 +57,38 @@
      <div id='basic-view'>
         <div id="inputzone">
             <div id="dropzone">
-				<form>
-					Upload type:
-					<input type="radio" name="action" id="standardOption" onclick='switchtoStandard()'><label for="standardOption">Standard</label>
-					<input type="radio" name="action" id="riseOption" onclick='switchtoRISE()'><label for="riseOption">RISE</label>
-				</form>
-                <button style='box-shadow:none; float:right;' onclick='minInputZone()'><i class="fa fa-minus-square" aria-hidden="true"></i></button>
-               <div style="text-align: left; margin-left:10px;color:#aaa"><br><b>Input files</b> - Drag and drop or click to browse:<br></div>
+               <div style="text-align: left; margin-left:10px;color:#aaa; font-size:x-large; line-height:75%"><br>Select a simulation to begin<br><br></div>
 		<div id="Standard">
-            <div class="dz" id="maFile">
-                  <br>Model <br>(.ma)
-                  <input onchange="inp.processDroppedFiles(this)" type="file" id="ma-file" multiple />
+            <div class="dz" id="fireModel" style="color:#fff; font-size:medium">
+				Forest Fire
+				  <img src="references/images/fire_model.png"/>
                   <div class='statBox'></div>
                </div>
 
-               <div class="dz" id="valFile">
-                  <br>Initial Values<br> (.val)
-                  <input onchange="inp.processDroppedFiles(this)" type="file" id="val-file" multiple />
+               <div class="dz" id="evacuationModel"style="color:#fff; font-size:medium">
+                  Ship Evacuation
+				  <img src="references/images/evacuation_model.jpg"/>
                   <div class='statBox'></div>
                </div>
 
-               <div class="dz" id="logFile">
-                  <br>Simulation Log<br> (.log)
-                  <input onchange="inp.processDroppedFiles(this)" type="file" id="log-file" multiple />
+               <div class="dz" id="tumourModel"style="color:#fff; font-size:medium" onclick="TIS.loadTIS()">
+                  Tumour Immune System
+				  <img src="references/images/tumour_model.png"/>
                   <div class='statBox'></div>
                </div>
 
-               <div class="dz" id="paletteFile">
-                  <br>Color Palette<br> (.pal)
-                  <input onchange="inp.processDroppedFiles(this)" type="file" id="pal-file" multiple />
+               <div class="dz" id="urbangrowthModel"style="color:#fff; font-size:large">
+                  Urban Growth
+				  <img src="references/images/urban_model.png"/>
                   <div class='statBox'></div>
                </div>
 			                  
 			   <br><br>
                &emsp;
-               <button onclick="grid.loadSimulation()" id="BtnParseY">Load Simulation</button>
-               <button style='background-color:green;' onclick="grid.loadTestSimulation()" id="BtnParseY">Load Test Files (in progress)</button>
+               <button style='background-color:green; display:none' onclick="TIS.loadTIS()" id="BtnParseY">Load Test Files (in progress)</button>
                <br><br>
 			   
 		</div>
-		
-		<div id="RISE" hidden>
-			<div class="dz" id="xmlFile">
-				<br> XML file (.xml)
-				<input onchange="grid.loadRISExml(this)" type="file" id="xml-file"accept="text/xml"/>
-				<div class='statBox'></div>
-			</div>
-			<div class="dz" id="zipFile">
-				<br>Zipfile (.zip)
-				<input onchange="grid.loadRISEzip(this)" type="file" id="zip-file" accept=".zip"/>
-				<div class='statBox'></div>
-			</div>
-						   
-			<br><br>
-            &emsp;
-			<button id="uploadRise" onclick="startSimulate()">Simulate on RISE</button>
-			<button id="Simulate" disabled>Run Simulation</button>
-			<br><br>
-		</div>
-
 
             </div>
 
@@ -126,12 +99,7 @@
          </div>
 
 
-   <h4>Advanced View </h4>
-     <label class="switch">
-      Basic View
-       <input id='basic-view-button' type='checkbox' name='view'/>
-       <span class='slider'></span>
-     </label> <br><br>
+
 
 
      </div>
@@ -200,7 +168,7 @@
             Pixels/cell (zoom):<input type="number" value="25" id="cellScale" step="1" min="1" max="500" oninput="grid.reCSSGrid(this)" />
             <span class="vsep"></span>
             Framerate (fps): <input type="number" value="15" id="framerate" min="1" max="500" oninput="grid.updateFPS()" /><span class="vsep"></span>
-            <button onclick="grid.recordFrames()" id="BtnRecord"><b style="color:#A44A4A">&#x25cf;</b> Record Video</button>
+            <button onclick="grid.recordFrames()" id="BtnRecord" style="display:none"><b style="color:#A44A4A;">&#x25cf;</b> Record Video</button>
             <span class="hideMe">Quality (0 - 1):<input type="number" value="0.95" id="vidQual" step=".05" min="0" max="1"/></span>
             <span id="videoLink" style="display:none">&nbsp;&nbsp;Video ready: <a id="videoViewLink" style="display:none;color:#AB7D6C;">watch &#x1f3a5;</a> |
             <a id="videoDownloadLink" style="display:none;color:#AB7D6C;">download &#8681;</a>
@@ -211,7 +179,7 @@
 
    <!-- END OF STICKY DIV - END OF MAIN CONTENT -->
 
-   <div id="chartsDiv" class="charts-container" style='text-align:right;padding-right:20px;'></div>
+   <div id="chartsDiv" class="charts-container" style='text-align:right;'></div>
    <div id="StatsOverlay" style= "display: none"></div>
    <div id="canvyDiv" style="display: none">
    <div class="canvas-btn-container">
@@ -292,6 +260,9 @@
    <script src="src/charting.js"></script>
    <script src="src/recording.js"></script>
    <script src="references/jszip.js"></script>
+   <script src="src/demo.js"></script>
+   <script src="demo/TIS.js"></script>
+
 
    <footer>
       <small>&copy; <a href='http://omarhesham.com/arslab'>Omar Hesham</a> |

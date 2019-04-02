@@ -762,7 +762,8 @@ canvas.addEventListener('mousemove', function(event) {
 
 function minInputZone(){
 	grab('inputzone').style.display = 'none';
-	grab('min-button-window-input').innerHTML += '<button onclick="maxInputZone()">Input Files</button>'
+	grab('min-button-window-input').innerHTML += '<button id = "minInput" onclick="maxInputZone()">Select Simulation</button>'
+	grab('minInput').style.fontSize = "x-large";
 }
 
 
@@ -785,7 +786,8 @@ function maxStatsZone(){
 
 function minCanvasZone(){
 	grab('canvyDiv').style.display = 'none';
-	grab('min-button-window-canvas').innerHTML += '<button onclick="maxCanvasZone()">Loaded Canvas</button>'
+	grab('min-button-window-canvas').innerHTML += '<button id = "minCanvas" onclick="maxCanvasZone()">Loaded Canvas</button>';
+	grab('minCanvas').style.fontSize = "x-large";
 }
 
 function maxCanvasZone(){
@@ -797,7 +799,8 @@ function minimizeStateFreqChart(){
 	grab('statechart-div').style.display = 'none';
 	grab('btn-max-stateFreqState').style.display = 'none';
 	grab('btn-statefreq').style.display = 'none';
-	grab('min-button-window-statesChart').innerHTML += '<button onclick="maxStateFreqChart()">State Frequency Chart</button>'
+	grab('min-button-window-statesChart').innerHTML += '<button id="minStates" onclick="maxStateFreqChart()">State Frequency Chart</button>'
+	grab('minStates').style.fontSize = "x-large";
 
 	if(grab('activitychart-div').style.display == "none"  && grab('cellschart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
@@ -806,7 +809,8 @@ function minimizeCellStateChart(){
 	grab('cellschart-div').style.display = 'none';
 	grab('btn-max-cellsState').style.display = 'none';
 	grab('btn-min-cellsState').style.display = 'none';
-	grab('min-button-window-cellsChart').innerHTML += '<button onclick="maxCellStateChart()">Cells State Chart</button>'
+	grab('min-button-window-cellsChart').innerHTML += '<button id="minCells" onclick="maxCellStateChart()">Cells State Chart</button>'
+	grab('minCells').style.fontSize = "x-large";
 
 	if(grab('activitychart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
@@ -815,8 +819,9 @@ function minimizeTransitionChart(){
 	grab('activitychart-div').style.display = 'none';
 	grab('btn-activity').style.display = 'none';
 	grab('btn-max-transition').style.display = 'none';
-	grab('min-button-window-transitionChart').innerHTML += '<button onclick="maxTransitionChart()">Transition Chart</button>';
-
+	grab('min-button-window-transitionChart').innerHTML += '<button id="minTransition" onclick="maxTransitionChart()">Transition Chart</button>';
+	grab('minTransition').style.fontSize = "x-large";
+	
 	if(grab('cellschart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
 }
