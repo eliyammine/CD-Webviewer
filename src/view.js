@@ -762,7 +762,7 @@ canvas.addEventListener('mousemove', function(event) {
 
 function minInputZone(){
 	grab('inputzone').style.display = 'none';
-	grab('min-button-window-input').innerHTML += '<button id = "minInput" onclick="maxInputZone()">Select Simulation</button>'
+	grab('min-button-window-input').innerHTML += '<button id = "minInput" onclick="maxInputZone()">Select Simulation</button>';
 	grab('minInput').style.fontSize = "x-large";
 }
 
@@ -821,7 +821,7 @@ function minimizeTransitionChart(){
 	grab('btn-max-transition').style.display = 'none';
 	grab('min-button-window-transitionChart').innerHTML += '<button id="minTransition" onclick="maxTransitionChart()">Transition Chart</button>';
 	grab('minTransition').style.fontSize = "x-large";
-	
+
 	if(grab('cellschart-div').style.display == "none"  && grab('statechart-div').style.display == "none" )
 		grab('chartsDiv').style.display = 'none';
 }
@@ -1169,7 +1169,7 @@ grid.statesList = function() {
 	track=track.substring(0,track.length-1);
 	states.value = track;
 }
-
+if (document.getElementById('basic-view-button')) {
 document.getElementById('basic-view-button').addEventListener('click', function(){
     if (this.checked) {
         document.getElementById('advanced-view').style.display ='block';
@@ -1178,7 +1178,7 @@ document.getElementById('basic-view-button').addEventListener('click', function(
         document.getElementById('advanced-view').style.display ='none';
        }
     });
-
+}
 function showStats(){
     var lineDialog = grab('lineGraphDialog');
 	lineDialog.showModal();

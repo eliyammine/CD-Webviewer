@@ -47,7 +47,7 @@
      </div>
       <div id='min-button-window-stats' style='display:inline-flex;'>
      </div>
-	 
+
 	 <div id='min-button-window-statesChart' style='display:inline-flex;'>
 	</div>
 	<div id='min-button-window-cellsChart' style='display:inline-flex;'>
@@ -59,13 +59,13 @@
             <div id="dropzone">
                <div style="text-align: left; margin-left:10px;color:#aaa; font-size:x-large; line-height:75%"><br>Select a simulation to begin<br><br></div>
 		<div id="Standard">
-            <div class="dz" id="fireModel" style="color:#fff; font-size:medium">
+            <div class="dz" id="fireModel" style="color:#fff; font-size:medium" onclick="fire.loadFire()">
 				Forest Fire
 				  <img src="references/images/fire_model.png"/>
                   <div class='statBox'></div>
                </div>
 
-               <div class="dz" id="evacuationModel"style="color:#fff; font-size:medium">
+               <div class="dz" id="evacuationModel"style="color:#fff; font-size:medium" onclick="shipEvac.loadShipEvac()">
                   Ship Evacuation
 				  <img src="references/images/evacuation_model.jpg"/>
                   <div class='statBox'></div>
@@ -77,17 +77,17 @@
                   <div class='statBox'></div>
                </div>
 
-               <div class="dz" id="urbangrowthModel"style="color:#fff; font-size:large">
+               <div class="dz" id="urbangrowthModel"style="color:#fff; font-size:large; display:none" onclick="urbanGrowth.loadUrbGrowth()">
                   Urban Growth
 				  <img src="references/images/urban_model.png"/>
                   <div class='statBox'></div>
                </div>
-			                  
+
 			   <br><br>
                &emsp;
                <button style='background-color:green; display:none' onclick="TIS.loadTIS()" id="BtnParseY">Load Test Files (in progress)</button>
                <br><br>
-			   
+
 		</div>
 
             </div>
@@ -95,7 +95,7 @@
                   <div id="LayersDiv" style='display:none;'>
                      &nbsp;&#8801; Detected layers:
                   <div id="LayersList" hidden></div>
-               </div>  
+               </div>
          </div>
 
 
@@ -204,12 +204,12 @@
       }
     </style>
 		<div id='lineBox'>
-          </div>	
+          </div>
         <footer>
           <button onclick='closeLineDialog();' type='reset'>Close</button>
         </footer>
     </dialog>
-	
+
 		   	 <dialog id="cellsStateDialog">
     <style>
       .line-chart
@@ -218,7 +218,7 @@
       }
     </style>
 		<div id='graphBox' class="dialog-container">
-          </div>	
+          </div>
         <footer>
           <button onclick='closeCellsStateDialog();' type='reset'>Close</button>
         </footer>
@@ -231,7 +231,7 @@
       }
     </style>
 		<div id='stateFreqBox' class="dialog-container">
-          </div>	
+          </div>
         <footer>
           <button onclick='closeStateFreqDialog();' type='reset'>Close</button>
         </footer>
@@ -244,13 +244,13 @@
       }
     </style>
 		<div id='transitionBox' >
-          </div>	
+          </div>
         <footer>
           <button onclick='closeTransitionDialog();' type='reset'>Close</button>
         </footer>
     </dialog>
-	
-	
+
+
    <script src="references/whammy.js"></script>
    <script src="references/d3-4.12.0/d3.min.js"></script>
    <script src="references/d3.legend.js"></script>
@@ -262,6 +262,9 @@
    <script src="references/jszip.js"></script>
    <script src="src/demo.js"></script>
    <script src="demo/TIS.js"></script>
+   <script src="demo/fire.js"></script>
+   <script src="demo/shipEvac.js"></script>
+   <script src="demo/urbanGrowth.js"></script>
 
 
    <footer>
